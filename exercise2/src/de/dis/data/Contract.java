@@ -1,28 +1,25 @@
 package de.dis.data;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Makler-Bean
+ * Contract-Bean
  * 
  * Beispiel-Tabelle:
- * CREATE TABLE makler (
- * name varchar(255), 
- * address varchar(255), 
- * login varchar(40) UNIQUE, 
- * password varchar(40), 
+ * CREATE TABLE contract (
+ * date varchar(255),  //todo switch to date
+ * place varchar(255), 
  * id serial primary key);
  */
 public class Contract {
 	private int id = -1;
-	private String name;
-	private String address;
-	private String login;
-	private String password;
+	private String date;
+	private String place;
 	
 	public int getId() {
 		return id;
@@ -32,42 +29,26 @@ public class Contract {
 		this.id = id;
 	}
 	
-	public String getName() {
-		return name;
+	public String getDate() {
+		return date;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void setDate(String date) {
+		this.date = date;
 	}
 	
-	public String getAddress() {
-		return address;
+	public String getPlace() {
+		return place;
 	}
 	
-	public void setAddress(String address) {
-		this.address = address;
-	}
-	
-	public String getLogin() {
-		return login;
-	}
-	
-	public void setLogin(String login) {
-		this.login = login;
-	}
-	
-	public String getPassword() {
-		return password;
-	}
-	
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPlace(String place) {
+		this.place = place;
 	}
 	
 	/**
-	 * Lädt einen Makler aus der Datenbank
-	 * @param id ID des zu ladenden Maklers
-	 * @return Makler-Instanz
+	 * Lädt einen Vertrag aus der Datenbank
+	 * @param id ID des zu ladenden Vertrag
+	 * @return Vertrags-Instanz
 	 */
 	public static Contract load(int id) {
 		try {
@@ -75,7 +56,7 @@ public class Contract {
 			Connection con = DbConnectionManager.getInstance().getConnection();
 
 			// Erzeuge Anfrage
-			String selectSQL = "SELECT * FROM makler WHERE id = ?";
+			String selectSQL = "SELECT * FROM contract WHERE id = ?";
 			PreparedStatement pstmt = con.prepareStatement(selectSQL);
 			pstmt.setInt(1, id);
 
@@ -84,10 +65,8 @@ public class Contract {
 			if (rs.next()) {
 				Contract ts = new Contract();
 				ts.setId(id);
-				ts.setName(rs.getString("name"));
-				ts.setAddress(rs.getString("address"));
-				ts.setLogin(rs.getString("login"));
-				ts.setPassword(rs.getString("password"));
+				ts.setDate(rs.getString("date"));
+				ts.setPlace(rs.getString("place"));
 
 				rs.close();
 				pstmt.close();
@@ -100,7 +79,7 @@ public class Contract {
 	}
 	
 	/**
-	 * Speichert den Makler in der Datenbank. Ist noch keine ID vergeben
+	 * Speichert den Vertrag in der Datenbank. Ist noch keine ID vergeben
 	 * worden, wird die generierte Id von der DB geholt und dem Model übergeben.
 	 */
 	public void save() {
@@ -108,20 +87,18 @@ public class Contract {
 		Connection con = DbConnectionManager.getInstance().getConnection();
 
 		try {
-			// FC<ge neues Element hinzu, wenn das Objekt noch keine ID hat.
+			// Füge neues Element hinzu, wenn das Objekt noch keine ID hat.
 			if (getId() == -1) {
 				// Achtung, hier wird noch ein Parameter mitgegeben,
-				// damit spC$ter generierte IDs zurC<ckgeliefert werden!
-				String insertSQL = "INSERT INTO makler(name, address, login, password) VALUES (?, ?, ?, ?)";
+				// damit speicter generierte IDs zurückgeliefert werden!
+				String insertSQL = "INSERT INTO contract(place, date) VALUES (?, ?)";
 
 				PreparedStatement pstmt = con.prepareStatement(insertSQL,
 						Statement.RETURN_GENERATED_KEYS);
 
 				// Setze Anfrageparameter und fC<hre Anfrage aus
-				pstmt.setString(1, getName());
-				pstmt.setString(2, getAddress());
-				pstmt.setString(3, getLogin());
-				pstmt.setString(4, getPassword());
+				pstmt.setString(1, getDate());
+				pstmt.setString(2, getPlace());
 				pstmt.executeUpdate();
 
 				// Hole die Id des engefC<gten Datensatzes
@@ -134,14 +111,12 @@ public class Contract {
 				pstmt.close();
 			} else {
 				// Falls schon eine ID vorhanden ist, mache ein Update...
-				String updateSQL = "UPDATE makler SET name = ?, address = ?, login = ?, password = ? WHERE id = ?";
+				String updateSQL = "UPDATE contract SET date = ?, place = ? WHERE id = ?";
 				PreparedStatement pstmt = con.prepareStatement(updateSQL);
 
 				// Setze Anfrage Parameter
-				pstmt.setString(1, getName());
-				pstmt.setString(2, getAddress());
-				pstmt.setString(3, getLogin());
-				pstmt.setString(4, getPassword());
+				pstmt.setString(1, getDate());
+				pstmt.setString(2, getPlace());
 				pstmt.setInt(5, getId());
 				pstmt.executeUpdate();
 

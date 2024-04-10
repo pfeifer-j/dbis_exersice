@@ -7,148 +7,142 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Makler-Bean
+ * Person-Bean
  * 
  * Beispiel-Tabelle:
- * CREATE TABLE makler (
- * name varchar(255), 
- * address varchar(255), 
- * login varchar(40) UNIQUE, 
- * password varchar(40), 
- * id serial primary key);
+ * CREATE TABLE person (
+ *  first_name varchar(255),
+ *  last_name varchar(255),
+ *  street varchar(255),
+ *  city varchar(255),
+ *  postalCode varchar(255)
  */
 public class Person {
-	private int id = -1;
-	private String name;
-	private String address;
-	private String login;
-	private String password;
-	
-	public int getId() {
-		return id;
-	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getAddress() {
-		return address;
-	}
-	
-	public void setAddress(String address) {
-		this.address = address;
-	}
-	
-	public String getLogin() {
-		return login;
-	}
-	
-	public void setLogin(String login) {
-		this.login = login;
-	}
-	
-	public String getPassword() {
-		return password;
-	}
-	
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	/**
-	 * Lädt einen Makler aus der Datenbank
-	 * @param id ID des zu ladenden Maklers
-	 * @return Makler-Instanz
-	 */
-	public static Makler load(int id) {
-		try {
-			// Hole Verbindung
-			Connection con = DbConnectionManager.getInstance().getConnection();
+    private int id = -1;
+    private String firstName;
+    private String lastName;
+    private String street;
+    private String city;
+    private String postalCode;
 
-			// Erzeuge Anfrage
-			String selectSQL = "SELECT * FROM makler WHERE id = ?";
-			PreparedStatement pstmt = con.prepareStatement(selectSQL);
-			pstmt.setInt(1, id);
+    // Getter and Setter methods for id
+    public int getId() {
+        return id;
+    }
 
-			// Führe Anfrage aus
-			ResultSet rs = pstmt.executeQuery();
-			if (rs.next()) {
-				Makler ts = new Makler();
-				ts.setId(id);
-				ts.setName(rs.getString("name"));
-				ts.setAddress(rs.getString("address"));
-				ts.setLogin(rs.getString("login"));
-				ts.setPassword(rs.getString("password"));
+    public void setId(int id) {
+        this.id = id;
+    }
 
-				rs.close();
-				pstmt.close();
-				return ts;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
-	 * Speichert den Makler in der Datenbank. Ist noch keine ID vergeben
-	 * worden, wird die generierte Id von der DB geholt und dem Model übergeben.
-	 */
-	public void save() {
-		// Hole Verbindung
-		Connection con = DbConnectionManager.getInstance().getConnection();
+    // Getter and Setter methods for firstName
+    public String getFirstName() {
+        return firstName;
+    }
 
-		try {
-			// FC<ge neues Element hinzu, wenn das Objekt noch keine ID hat.
-			if (getId() == -1) {
-				// Achtung, hier wird noch ein Parameter mitgegeben,
-				// damit spC$ter generierte IDs zurC<ckgeliefert werden!
-				String insertSQL = "INSERT INTO makler(name, address, login, password) VALUES (?, ?, ?, ?)";
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-				PreparedStatement pstmt = con.prepareStatement(insertSQL,
-						Statement.RETURN_GENERATED_KEYS);
+    // Getter and Setter methods for lastName
+    public String getLastName() {
+        return lastName;
+    }
 
-				// Setze Anfrageparameter und fC<hre Anfrage aus
-				pstmt.setString(1, getName());
-				pstmt.setString(2, getAddress());
-				pstmt.setString(3, getLogin());
-				pstmt.setString(4, getPassword());
-				pstmt.executeUpdate();
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-				// Hole die Id des engefC<gten Datensatzes
-				ResultSet rs = pstmt.getGeneratedKeys();
-				if (rs.next()) {
-					setId(rs.getInt(1));
-				}
+    // Getter and Setter methods for street
+    public String getStreet() {
+        return street;
+    }
 
-				rs.close();
-				pstmt.close();
-			} else {
-				// Falls schon eine ID vorhanden ist, mache ein Update...
-				String updateSQL = "UPDATE makler SET name = ?, address = ?, login = ?, password = ? WHERE id = ?";
-				PreparedStatement pstmt = con.prepareStatement(updateSQL);
+    public void setStreet(String street) {
+        this.street = street;
+    }
 
-				// Setze Anfrage Parameter
-				pstmt.setString(1, getName());
-				pstmt.setString(2, getAddress());
-				pstmt.setString(3, getLogin());
-				pstmt.setString(4, getPassword());
-				pstmt.setInt(5, getId());
-				pstmt.executeUpdate();
+    // Getter and Setter methods for city
+    public String getCity() {
+        return city;
+    }
 
-				pstmt.close();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    // Getter and Setter methods for postalCode
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public static Person load(int id) {
+        try {
+            Connection con = DbConnectionManager.getInstance().getConnection();
+            String selectSQL = "SELECT * FROM person WHERE id = ?";
+            PreparedStatement pstmt = con.prepareStatement(selectSQL);
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Person person = new Person();
+                person.setId(id);
+                person.setFirstName(rs.getString("first_name"));
+                person.setLastName(rs.getString("last_name"));
+                person.setStreet(rs.getString("street"));
+                person.setCity(rs.getString("city"));
+                person.setPostalCode(rs.getString("postalCode"));
+
+                rs.close();
+                pstmt.close();
+                return person;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Save method
+    public void save() {
+        Connection con = DbConnectionManager.getInstance().getConnection();
+        try {
+            if (getId() == -1) {
+                String insertSQL = "INSERT INTO person(first_name, last_name, street, city, postalCode) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, getFirstName());
+                pstmt.setString(2, getLastName());
+                pstmt.setString(3, getStreet());
+                pstmt.setString(4, getCity());
+                pstmt.setString(5, getPostalCode());
+                pstmt.executeUpdate();
+
+                ResultSet rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    setId(rs.getInt(1));
+                }
+
+                rs.close();
+                pstmt.close();
+            } else {
+                String updateSQL = "UPDATE person SET first_name = ?, last_name = ?, street = ?, city = ?, postalCode = ? WHERE id = ?";
+                PreparedStatement pstmt = con.prepareStatement(updateSQL);
+
+                pstmt.setString(1, getFirstName());
+                pstmt.setString(2, getLastName());
+                pstmt.setString(3, getStreet());
+                pstmt.setString(4, getCity());
+                pstmt.setString(5, getPostalCode());
+                pstmt.setInt(6, getId());
+                pstmt.executeUpdate();
+
+                pstmt.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
