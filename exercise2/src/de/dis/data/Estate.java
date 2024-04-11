@@ -5,43 +5,46 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Estate-Bean
  * 
  * Beispiel-Tabelle:
- * CREATE TABLE estate (^^
- * city varchar(255), 
- * postalCode varchar(255), 
- * street varchar(255), 
- * streetNumber int, 
+ * CREATE TABLE estate (
+ * id serial primary key,
+ * city varchar(255),
+ * postalCode varchar(255),
+ * street varchar(255),
+ * streetNumber int,
  * floor int,
  * price decimal(10, 2),
- * rooms int, 
+ * rooms int,
  * has_balcony bool, //todo
  * has_kitchen bool,
  * floors int,
  * price decimal(10, 2),
  * has_garden bool,
- * squareArea int, 
- * id serial primary key);
+ * squareArea int);
  */
 public class Estate {
-	private int id = -1;
+    private int id = -1;
     private String city;
     private String postalCode;
     private String street;
     private int streetNumber;
     private int floor;
     private double price;
+    private double rent;
     private int rooms;
     private boolean hasBalcony;
     private boolean hasKitchen;
     private int floors;
     private boolean hasGarden;
     private int squareArea;
-	
-	// Getter and Setter methods for city
+
+    // Getter and Setter methods for city
     public String getCity() {
         return city;
     }
@@ -93,6 +96,15 @@ public class Estate {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    // Getter and Setter methods for rent
+    public double getRent() {
+        return rent;
+    }
+
+    public void setRent(double rent) {
+        this.rent = rent;
     }
 
     // Getter and Setter methods for rooms
@@ -157,12 +169,13 @@ public class Estate {
     public void setId(int id) {
         this.id = id;
     }
-	
-	/**
-	 * Lädt einen Makler aus der Datenbank
-	 * @param id ID des zu ladenden Maklers
-	 * @return Makler-Instanz
-	 */
+
+    /**
+     * Lädt eine Immobilie aus der Datenbank
+     * 
+     * @param id ID des zu ladenden Maklers
+     * @return Immobilien-Instanz
+     */
     // Load method
     public static Estate load(int id) {
         try {
@@ -250,5 +263,67 @@ public class Estate {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    // Inside the Estate class
+    public void delete() {
+        if (getId() == -1) {
+            System.out.println("Cannot delete estate with invalid ID.");
+            return;
+        }
+
+        Connection con = DbConnectionManager.getInstance().getConnection();
+        try {
+            String deleteSQL = "DELETE FROM estate WHERE id = ?";
+            PreparedStatement pstmt = con.prepareStatement(deleteSQL);
+            pstmt.setInt(1, getId());
+            int rowsAffected = pstmt.executeUpdate();
+            pstmt.close();
+
+            if (rowsAffected > 0) {
+                System.out.println("Estate with ID " + getId() + " has been deleted successfully.");
+            } else {
+                System.out.println("No estate found with ID " + getId() + ".");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Lade alle Immobilien.
+     * 
+     * @return List of all estates
+     */
+    public static List<Estate> loadAll() {
+        List<Estate> estates = new ArrayList<>();
+        try {
+            Connection con = DbConnectionManager.getInstance().getConnection();
+            String selectSQL = "SELECT * FROM estate";
+            PreparedStatement pstmt = con.prepareStatement(selectSQL);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Estate estate = new Estate();
+                estate.setId(rs.getInt("id"));
+                estate.setCity(rs.getString("city"));
+                estate.setPostalCode(rs.getString("postalCode"));
+                estate.setStreet(rs.getString("street"));
+                estate.setStreetNumber(rs.getInt("streetNumber"));
+                estate.setFloor(rs.getInt("floor"));
+                estate.setPrice(rs.getDouble("price"));
+                estate.setRooms(rs.getInt("rooms"));
+                estate.setHasBalcony(rs.getBoolean("has_balcony"));
+                estate.setHasKitchen(rs.getBoolean("has_kitchen"));
+                estate.setFloors(rs.getInt("floors"));
+                estate.setHasGarden(rs.getBoolean("has_garden"));
+                estate.setSquareArea(rs.getInt("squareArea"));
+                estates.add(estate);
+            }
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return estates;
     }
 }

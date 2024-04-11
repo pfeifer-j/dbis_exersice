@@ -5,17 +5,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Makler-Bean
  * 
  * Beispiel-Tabelle:
  * CREATE TABLE makler (
+ * id serial primary key,
  * name varchar(255), 
  * address varchar(255), 
  * login varchar(40) UNIQUE, 
- * password varchar(40), 
- * id serial primary key);
+ * password varchar(40);
  */
 public class Makler {
 	private int id = -1;
@@ -151,4 +153,42 @@ public class Makler {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+     * Fetches all Maklers from the database
+     * 
+     * @return List of Makler objects
+     */
+    public static List<Makler> fetchAllMaklers() {
+        List<Makler> maklers = new ArrayList<>();
+
+        try {
+            // Get database connection
+            Connection con = DbConnectionManager.getInstance().getConnection();
+
+            // Create and execute SQL query
+            String selectSQL = "SELECT * FROM makler";
+            PreparedStatement pstmt = con.prepareStatement(selectSQL);
+            ResultSet rs = pstmt.executeQuery();
+
+            // Process result set and populate Makler objects
+            while (rs.next()) {
+                Makler makler = new Makler();
+                makler.setId(rs.getInt("id"));
+                makler.setName(rs.getString("name"));
+                makler.setAddress(rs.getString("address"));
+                makler.setLogin(rs.getString("login"));
+                makler.setPassword(rs.getString("password"));
+                maklers.add(makler);
+            }
+
+            // Close resources
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return maklers;
+    }
 }

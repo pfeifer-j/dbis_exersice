@@ -11,11 +11,12 @@ import java.sql.Statement;
  * 
  * Beispiel-Tabelle:
  * CREATE TABLE person (
+ *  id serial primary key,
  *  first_name varchar(255),
  *  last_name varchar(255),
  *  street varchar(255),
  *  city varchar(255),
- *  postalCode varchar(255)
+ *  postalCode varchar(255));
  */
 public class Person {
     private int id = -1;
