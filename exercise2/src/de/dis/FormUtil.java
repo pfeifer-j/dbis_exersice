@@ -124,7 +124,6 @@ public class FormUtil {
 				System.err.println("Ungültige Eingabe: Bitte geben Sie das Datum im Format 'yyyy-MM-dd' an!");
 			}
 		}
-
 		return ret;
 	}
 }

@@ -2,9 +2,12 @@ package de.dis;
 
 import de.dis.data.Makler;
 import de.dis.data.Estate;
+import de.dis.data.House;
 
 import java.util.List;
 
+import de.dis.data.Address;
+import de.dis.data.Apartment;
 import de.dis.data.Contract;
 import de.dis.data.Person;
 
@@ -42,10 +45,14 @@ public class Main {
 
 			switch (response) {
 				case MENU_MAKLER:
-					showAccountMenu();
+					if (loginMaklerMenu()) {
+						showAccountMenu();
+					}
 					break;
 				case MENU_ESTATE:
-					showEstateMenu();
+					if (loginEstateMenu()) {
+						showEstateMenu();
+					}
 					break;
 				case MENU_CONTRACT:
 					showContractMenu();
@@ -60,9 +67,6 @@ public class Main {
 	 * Zeigt die Maklerverwaltung
 	 */
 	private static void showAccountMenu() {
-		if (!loginMakler()) {
-			return;
-		}
 
 		// Menüoptionen
 		final int CREATE_MAKLER = 0;
@@ -98,38 +102,34 @@ public class Main {
 	}
 
 	/**
-	 * Legt einen neuen Makler an, nachdem der Benutzer
-	 * die entprechenden Daten eingegeben hat.
+	 * Legt einen neuen Makler an
 	 */
 	private static void createMakler() {
-		Makler m = new Makler();
+		Makler makler = new Makler();
 
-		m.setName(FormUtil.readString("Name"));
-		m.setAddress(FormUtil.readString("Adresse"));
-		m.setLogin(FormUtil.readString("Login"));
-		m.setPassword(FormUtil.readString("Passwort"));
-		m.save();
+		makler.setName(FormUtil.readString("Name"));
+		makler.setAddress(FormUtil.readString("Adresse"));
+		makler.setLogin(FormUtil.readString("Login"));
+		makler.setPassword(FormUtil.readString("Passwort"));
+		makler.save();
 
-		System.out.println("Makler mit der ID " + m.getId() + " wurde erzeugt.");
+		System.out.println("Makler mit der ID " + makler.getId() + " wurde erzeugt.");
 	}
 
 	/**
-	 * Bearbeitet einen bestehenden Makler.
+	 * Bearbeitet einen bestehenden Makler
 	 */
 	private static void updateMakler() {
-		// Fetch all Maklers from the database
-		List<Makler> maklers = Makler.fetchAllMaklers();
-
-		// Display all Maklers to the user along with their IDs
-		System.out.println("Available Maklers:");
+		// Lade alle Makler
+		List<Makler> maklers = Makler.loadAll();
+		System.out.println("Alle Makler:");
 		for (Makler makler : maklers) {
 			System.out.println(makler.getId() + ": " + makler.getName());
 		}
 
-		// Prompt the user to enter the ID of the Makler to update
-		int maklerIdToUpdate = FormUtil.readInt("Enter the ID of the Makler to update: ");
+		// Finde Makler
+		int maklerIdToUpdate = FormUtil.readInt("Makler ID: ");
 
-		// Find the Makler with the specified ID
 		Makler maklerToUpdate = null;
 		for (Makler makler : maklers) {
 			if (makler.getId() == maklerIdToUpdate) {
@@ -138,23 +138,22 @@ public class Main {
 			}
 		}
 		if (maklerToUpdate == null) {
-			System.out.println("Makler with ID " + maklerIdToUpdate + " not found.");
+			System.out.println("Makler mit ID " + maklerIdToUpdate + " nicht gefunden.");
 			return;
 		}
 
-		// Display the current information of the Makler
+		// Zeige Makler
 		System.out.println("Current information of the Makler:");
 		System.out.println("ID: " + maklerToUpdate.getId());
 		System.out.println("Name: " + maklerToUpdate.getName());
-		System.out.println("Address: " + maklerToUpdate.getAddress());
+		System.out.println("Address: " + maklerToUpdate.getAddress()); // todo
 		System.out.println("Login: " + maklerToUpdate.getLogin());
 
-		// Prompt the user to update Makler information
-		String newName = FormUtil.readString("Enter new name (press Enter to keep the current name): ");
+		String newName = FormUtil.readString("Name: ");
 		if (!newName.isEmpty()) {
 			maklerToUpdate.setName(newName);
 		}
-		String newAddress = FormUtil.readString("Enter new address (press Enter to keep the current address): ");
+		String newAddress = FormUtil.readString("Addresse: ");
 		if (!newAddress.isEmpty()) {
 			maklerToUpdate.setAddress(newAddress);
 		}
@@ -177,7 +176,11 @@ public class Main {
 	 * Löscht einen bestehenden Makler.
 	 */
 	private static void deleteMakler() {
-		// todo
+		listMaklers();
+		Makler makler = new Makler();
+		makler.setId(FormUtil.readInt("ID"));
+		makler.delete();
+		listMaklers();
 	}
 
 	/**
@@ -223,46 +226,50 @@ public class Main {
 		}
 	}
 
-	/*
-	 * Login für Makler.
-	 */
-	private static boolean loginMakler() {
-		// Hardcoded Password
-		String securePwd = "000";
-		String loginPwd = FormUtil.readString("Login-Password");
-
-		if (securePwd.equals(loginPwd)) {
-			System.out.println("Successfull login");
-			return true;
-		} else {
-			System.out.println("Wrong password");
-			return false;
-		}
-	}
-
 	/**
 	 * Legt neue Immobilie an.
 	 */
 	private static void createEstate() {
-		Estate estate = new Estate();
+		// Prompt the user to choose between creating a house or an apartment
+		System.out.println("Welche Art von Immobilie möchten Sie erstellen?");
+		System.out.println("1. Haus");
+		System.out.println("2. Wohnung");
+		int estateTypeChoice = FormUtil.readInt("Ihre Wahl");
 
-		// Prompt the user for estate details
+		Estate estate;
+		switch (estateTypeChoice) {
+			case 1:
+				House house = new House();
+				house.setFloors(FormUtil.readInt("Etagenanzahl"));
+				house.setPrice(FormUtil.readDouble("Preis"));
+				house.setHasGarden(FormUtil.readBoolean("Hat Garten (true/false)"));
+				estate = house;
+				break;
+			case 2:
+				Apartment apartment = new Apartment();
+				apartment.setFloor(FormUtil.readInt("Stockwerk"));
+				apartment.setRent(FormUtil.readDouble("Miete"));
+				apartment.setRooms(FormUtil.readInt("Zimmer"));
+				apartment.setHasBalcony(FormUtil.readBoolean("Hat Balkon (true/false)"));
+				apartment.setHasKitchen(FormUtil.readBoolean("Hat Küche (true/false)"));
+				estate = apartment;
+				break;
+			default:
+				System.out.println("Ungültige Auswahl.");
+				return;
+		}
+
+		// Proceed with setting the common details
 		System.out.println("Neue Immobilie anlegen:");
-		estate.setCity(FormUtil.readString("Stadt"));
-		estate.setPostalCode(FormUtil.readString("Postleitzahl"));
-		estate.setStreet(FormUtil.readString("Straße"));
-		estate.setStreetNumber(FormUtil.readInt("Hausnummer"));
-		estate.setFloor(FormUtil.readInt("Stockwerk"));
-		estate.setPrice(FormUtil.readDouble("Preis"));
-		estate.setRent(FormUtil.readDouble("Miete"));
-		estate.setRooms(FormUtil.readInt("Zimmer"));
-		estate.setHasBalcony(FormUtil.readBoolean("Hat Balkon (true/false)"));
-		estate.setHasKitchen(FormUtil.readBoolean("Hat Küche (true/false)"));
-		estate.setFloors(FormUtil.readInt("Etagenanzahl"));
-		estate.setHasGarden(FormUtil.readBoolean("Hat Garten (true/false)"));
-		estate.setSquareArea(FormUtil.readInt("Grundstücksfläche"));
+		Address address = new Address();
+		address.setCity(FormUtil.readString("Stadt"));
+		address.setPostalcode(FormUtil.readString("Postleitzahl"));
+		address.setStreet(FormUtil.readString("Straße"));
+		address.setStreetnumber(FormUtil.readString("Hausnummer"));
+		address.save();
 
-		// Save the estate to the database
+		estate.setAddressId(address.getId());
+		estate.setSquare(FormUtil.readDouble("Grundstücksfläche"));
 		estate.save();
 
 		System.out.println("Immobilie mit der ID " + estate.getId() + " wurde erstellt.");
@@ -274,45 +281,32 @@ public class Main {
 	private static void updateEstate() {
 		listEstates();
 		int idToUpdate = FormUtil.readInt("ID of estate");
-	
+
 		// Check if the ID exists
 		if (!isExistingEstateId(idToUpdate)) {
 			System.out.println("Estate with ID " + idToUpdate + " does not exist.");
 			return;
 		}
-	
-		// Proceed with updating the estate
-		Estate estate = new Estate();
-		estate.setId(idToUpdate);
-	
+
+		// Load the estate
+		Estate estate = Estate.load(idToUpdate);
+
 		// Prompt the user for estate details
-		estate.setCity(FormUtil.readString("Stadt"));
-		estate.setPostalCode(FormUtil.readString("Postleitzahl"));
-		estate.setStreet(FormUtil.readString("Straße"));
-		estate.setStreetNumber(FormUtil.readInt("Hausnummer"));
-		estate.setFloor(FormUtil.readInt("Stockwerk"));
-		estate.setPrice(FormUtil.readDouble("Preis"));
-		estate.setRent(FormUtil.readDouble("Miete"));
-		estate.setRooms(FormUtil.readInt("Zimmer"));
-		estate.setHasBalcony(FormUtil.readBoolean("Hat Balkon (true/false)"));
-		estate.setHasKitchen(FormUtil.readBoolean("Hat Küche (true/false)"));
-		estate.setFloors(FormUtil.readInt("Etagenanzahl"));
-		estate.setHasGarden(FormUtil.readBoolean("Hat Garten (true/false)"));
-		estate.setSquareArea(FormUtil.readInt("Grundstücksfläche"));
+		System.out.println("Ändern der Immobilie mit ID " + estate.getId());
+
+		// Prompt the user for address details
+		Address address = new Address();
+		address.setCity(FormUtil.readString("Stadt"));
+		address.setPostalcode(FormUtil.readString("Postleitzahl"));
+		address.setStreet(FormUtil.readString("Straße"));
+		address.setStreetnumber(FormUtil.readString("Hausnummer"));
+		address.save();
+
+		// Update the estate in the database
+		estate.setAddressId(address.getId());
 		estate.save();
-	
+
 		listEstates();
-	}
-	
-	// Check if the estate ID exists in the database
-	private static boolean isExistingEstateId(int id) {
-		List<Estate> estates = Estate.loadAll();
-		for (Estate estate : estates) {
-			if (estate.getId() == id) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -320,9 +314,30 @@ public class Main {
 	 */
 	private static void deleteEstate() {
 		listEstates();
-		Estate estate = new Estate();
-		estate.setId(FormUtil.readInt("ID"));
-		estate.delete();
+		int idToDelete = FormUtil.readInt("ID of estate to delete");
+
+		// Check if the ID exists
+		if (!isExistingEstateId(idToDelete)) {
+			System.out.println("Estate with ID " + idToDelete + " does not exist.");
+			return;
+		}
+
+		// Load the estate
+		Estate estate = Estate.load(idToDelete);
+
+		// Check if the estate is a house or an apartment
+		if (estate instanceof House) {
+			// If it's a house, call the delete method for houses
+			((House) estate).delete();
+		} else if (estate instanceof Apartment) {
+			// If it's an apartment, call the delete method for apartments
+			((Apartment) estate).delete();
+		} else {
+			// For general estates, just call the delete method
+			System.out.println("Immobilie mit ID " + idToDelete + " konnte nicht gelöscht werden.");
+		}
+
+		System.out.println("Immobilie mit ID " + idToDelete + " wurde gelöscht.");
 		listEstates();
 	}
 
@@ -360,6 +375,17 @@ public class Main {
 					return;
 			}
 		}
+	}
+
+	// Check if the estate ID exists in the database
+	private static boolean isExistingEstateId(int id) {
+		List<Estate> estates = Estate.loadAll();
+		for (Estate estate : estates) {
+			if (estate.getId() == id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -417,29 +443,59 @@ public class Main {
 	}
 
 	/**
-	 * Listet alle Immobilien auf.
+	 * Listet alle Makler auf.
+	 */
+	private static void listMaklers() {
+		List<Makler> maklers = Makler.loadAll();
+		if (maklers != null && !maklers.isEmpty()) {
+			for (Makler makler : maklers) {
+				System.out.println("Makler ID: " + makler.getId());
+				System.out.println("Name: " + makler.getLogin());
+				System.out.println("------------------------");
+			}
+		} else {
+			System.out.println("Keine Makler vorhanden.");
+		}
+	}
+
+	/**
+	 * Listet alle Immobilien auf. todoy
 	 */
 	private static void listEstates() {
 		List<Estate> estates = Estate.loadAll();
 		if (estates != null && !estates.isEmpty()) {
 			for (Estate estate : estates) {
 				System.out.println("Estate ID: " + estate.getId());
-				System.out.println("City: " + estate.getCity());
-				System.out.println("Postal Code: " + estate.getPostalCode());
-				System.out.println("Street: " + estate.getStreet());
-				System.out.println("Street Number: " + estate.getStreetNumber());
-				System.out.println("Floor: " + estate.getFloor());
-				System.out.println("Price: " + estate.getPrice());
-				System.out.println("Rooms: " + estate.getRooms());
-				System.out.println("Has Balcony: " + estate.isHasBalcony());
-				System.out.println("Has Kitchen: " + estate.isHasKitchen());
-				System.out.println("Floors: " + estate.getFloors());
-				System.out.println("Has Garden: " + estate.isHasGarden());
-				System.out.println("Square Area: " + estate.getSquareArea());
 				System.out.println("------------------------");
 			}
 		} else {
 			System.out.println("No estates found.");
+		}
+	}
+
+	private static boolean loginEstateMenu() {
+		String login = FormUtil.readString("Login");
+		String password = FormUtil.readString("Passwort");
+
+		Makler makler = Makler.loadByLogin(login);
+
+		return makler.getPassword().equals(password);
+	}
+
+	/*
+	 * Login für Makler.
+	 */
+	private static boolean loginMaklerMenu() {
+		// Hardcoded Password
+		String securePwd = "000";
+		String loginPwd = FormUtil.readString("Login-Password");
+
+		if (securePwd.equals(loginPwd)) {
+			System.out.println("Successfull login");
+			return true;
+		} else {
+			System.out.println("Wrong password");
+			return false;
 		}
 	}
 }
