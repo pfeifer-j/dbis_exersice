@@ -10,31 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 
-/**
- * Contract-Bean
- * 
- * Beispiel-Tabelle:
- * CREATE TABLE contract (
- * contract_number INT PRIMARY KEY,
- * date DATE,
- * place VARCHAR(255)
- * );
- * 
- * CREATE TABLE tenancy_contract (
- * start_date DATE,
- * duration DECIMAL,
- * additional_costs DECIMAL,
- * number INT,
- * FOREIGN KEY (number) REFERENCES contract(contract_number)
- * );
- * 
- * CREATE TABLE purchase_contract (
- * number_of_installments INT,
- * interest_rate DECIMAL,
- * number INT,
- * FOREIGN KEY (number) REFERENCES contract(contract_number)
- * );
- */
 public class Contract {
     private int id = -1;
     private Date date;
@@ -116,7 +91,6 @@ public class Contract {
                 String updateSQL = "UPDATE contract SET date = ?, place = ? WHERE id = ?";
                 PreparedStatement pstmt = con.prepareStatement(updateSQL);
 
-                // Format the date to match the expected format (e.g., yyyy-MM-dd)
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 String formattedDate = dateFormat.format(getDate());
                 pstmt.setString(1, formattedDate);
