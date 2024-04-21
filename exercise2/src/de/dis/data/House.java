@@ -1,12 +1,10 @@
-package de.dis.data.done;
+package de.dis.data;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import de.dis.data.DbConnectionManager;
 
 public class House extends Estate {
     private int floors;
@@ -48,7 +46,7 @@ public class House extends Estate {
         this.hasGarden = hasGarden;
     }
 
-    public static House load(int id) {
+    public static House loadHouse(int id) {
         House house = null;
         try {
             Connection con = DbConnectionManager.getInstance().getConnection();
@@ -61,6 +59,11 @@ public class House extends Estate {
                 house.setId(rs.getInt("id"));
                 house.setSquare(rs.getDouble("square"));
                 house.setAgent(rs.getInt("agent_id"));
+                // Set Estate attributes using super
+                house.setCity(rs.getString("city"));
+                house.setStreet(rs.getString("street"));
+                house.setStreetNumber(rs.getString("streetnumber"));
+                house.setPostalCode(rs.getString("postalcode"));
                 house.setFloors(rs.getInt("floors"));
                 house.setPrice(rs.getDouble("price"));
                 house.setHasGarden(rs.getBoolean("garden"));
@@ -71,31 +74,34 @@ public class House extends Estate {
             e.printStackTrace();
         }
         return house;
-    }
-
-    public void save() {
+    }public void saveHouse() {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
             if (getId() == -1) {
-                String insertSQL = "INSERT INTO estate (square, agent_id) VALUES (?, ?)";
+                String insertSQL = "INSERT INTO estate (square, agent_id, city, street, streetnumber, postalcode) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
                 pstmt.setDouble(1, getSquare());
                 pstmt.setInt(2, getAgent());
+                // Set Estate attributes using super
+                pstmt.setString(3, getCity());
+                pstmt.setString(4, getStreet());
+                pstmt.setString(5, getStreetNumber());
+                pstmt.setString(6, getPostalCode());
                 pstmt.executeUpdate();
-
+    
                 ResultSet rs = pstmt.getGeneratedKeys();
-                int estateId = -1;
+                int id = -1;
                 if (rs.next()) {
-                    estateId = rs.getInt(1);
-                    this.setId(estateId);
+                    id = rs.getInt(1);
+                    this.setId(id);
                 }
                 rs.close();
                 pstmt.close();
-
-                if (estateId != -1) {
+    
+                if (id != -1) {
                     String insertHouseSQL = "INSERT INTO house (id, floors, price, garden) VALUES (?, ?, ?, ?)";
                     PreparedStatement pstmtHouse = con.prepareStatement(insertHouseSQL);
-                    pstmtHouse.setInt(1, estateId);
+                    pstmtHouse.setInt(1, id);
                     pstmtHouse.setInt(2, getFloors());
                     pstmtHouse.setDouble(3, getPrice());
                     pstmtHouse.setBoolean(4, isHasGarden());
@@ -103,14 +109,18 @@ public class House extends Estate {
                     pstmtHouse.close();
                 }
             } else {
-                String updateSQL = "UPDATE estate SET square = ?, agent_id = ? WHERE id = ?";
+                String updateSQL = "UPDATE estate SET square = ?, agent_id = ?, city = ?, street = ?, streetnumber = ?, postalcode = ? WHERE id = ?";
                 PreparedStatement pstmt = con.prepareStatement(updateSQL);
                 pstmt.setDouble(1, getSquare());
                 pstmt.setInt(2, getAgent());
-                pstmt.setInt(3, getId());
+                pstmt.setString(3, getCity());
+                pstmt.setString(4, getStreet());
+                pstmt.setString(5, getStreetNumber());
+                pstmt.setString(6, getPostalCode());
+                pstmt.setInt(7, getId());
                 pstmt.executeUpdate();
                 pstmt.close();
-
+    
                 String updateHouseSQL = "UPDATE house SET floors = ?, price = ?, garden = ? WHERE id = ?";
                 PreparedStatement pstmtHouse = con.prepareStatement(updateHouseSQL);
                 pstmtHouse.setInt(1, getFloors());
@@ -124,8 +134,8 @@ public class House extends Estate {
             e.printStackTrace();
         }
     }
-
-    public void delete() {
+    
+    public void deleteHouse() {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
             String deleteHouseSQL = "DELETE FROM house WHERE id = ?";

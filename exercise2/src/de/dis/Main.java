@@ -2,12 +2,14 @@ package de.dis;
 
 import java.util.List;
 
+import de.dis.data.Agent;
+import de.dis.data.Apartment;
 import de.dis.data.Contract;
-import de.dis.data.done.Agent;
-import de.dis.data.done.Apartment;
-import de.dis.data.done.Estate;
-import de.dis.data.done.House;
-import de.dis.data.done.Person;
+import de.dis.data.Estate;
+import de.dis.data.House;
+import de.dis.data.Person;
+import de.dis.data.PurchaseContract;
+import de.dis.data.TenancyContract;
 
 /**
  * Main class
@@ -95,7 +97,7 @@ public class Main {
 		agent.setName(FormUtil.readString("Name"));
 		agent.setLogin(FormUtil.readString("Login"));
 		agent.setPassword(FormUtil.readString("Password"));
-		agent.setOldAddress(FormUtil.readString("Address"));
+		agent.setAddress(FormUtil.readString("Address"));
 
 		agent.save();
 
@@ -110,26 +112,15 @@ public class Main {
 		}
 
 		int agentIdToUpdate = FormUtil.readInt("Agent ID: ");
-
-		Agent agentToUpdate = null;
-		for (Agent agent : agents) {
-			if (agent.getId() == agentIdToUpdate) {
-				agentToUpdate = agent;
-				break;
-			}
-		}
-		if (agentToUpdate == null) {
-			System.out.println("Agent with ID " + agentIdToUpdate + " not found.");
-			return;
-		}
+		Agent agentToUpdate = Agent.loadById(agentIdToUpdate);
 
 		System.out.println("Current information of the Agent:");
 		System.out.println("ID: " + agentToUpdate.getId());
 		System.out.println("Name: " + agentToUpdate.getName());
 		System.out.println("Login: " + agentToUpdate.getLogin());
-		System.out.println("Address: " + agentToUpdate.getOldAddress());
+		System.out.println("Address: " + agentToUpdate.getAddress());
 
-		String newName = FormUtil.readString("Name: ");
+		String newName = FormUtil.readString("Enter new name: ");
 		if (!newName.isEmpty()) {
 			agentToUpdate.setName(newName);
 		}
@@ -144,7 +135,7 @@ public class Main {
 
 		String address = FormUtil.readString("Enter new address: ");
 		if (!address.isEmpty()) {
-			agentToUpdate.setOldAddress(address);
+			agentToUpdate.setAddress(address);
 		}
 
 		agentToUpdate.save();
@@ -193,7 +184,7 @@ public class Main {
 					createEstate(agent.getId());
 					break;
 				case UPDATE_ESTATE:
-					updateEstate();
+					updateEstate(agent.getId());
 					break;
 				case DELETE_ESTATE:
 					deleteEstate();
@@ -210,14 +201,21 @@ public class Main {
 		System.out.println("2. Apartment");
 		int estateTypeChoice = FormUtil.readInt("Your choice");
 
-		Estate estate;
 		switch (estateTypeChoice) {
 			case 1:
 				House house = new House();
 				house.setFloors(FormUtil.readInt("Number of Floors"));
 				house.setPrice(FormUtil.readDouble("Price"));
 				house.setHasGarden(FormUtil.readBoolean("Has Garden (true/false)"));
-				estate = house;
+				house.setSquare(FormUtil.readDouble("Square in m^2"));
+				house.setCity(FormUtil.readString("City"));
+				house.setPostalCode(FormUtil.readString("Postal Code"));
+				house.setStreet(FormUtil.readString("Street"));
+				house.setStreetNumber(FormUtil.readString("Street Number"));
+				house.setAgent(agentId);
+				house.saveHouse();
+				System.out.println("House with ID " + house.getId() + " has been created.");
+
 				break;
 			case 2:
 				Apartment apartment = new Apartment();
@@ -226,68 +224,96 @@ public class Main {
 				apartment.setRooms(FormUtil.readInt("Rooms"));
 				apartment.setHasBalcony(FormUtil.readBoolean("Has Balcony (true/false)"));
 				apartment.setHasKitchen(FormUtil.readBoolean("Has Kitchen (true/false)"));
-				estate = apartment;
+				apartment.setSquare(FormUtil.readDouble("Square in m^2"));
+				apartment.setCity(FormUtil.readString("City"));
+				apartment.setPostalCode(FormUtil.readString("Postal Code"));
+				apartment.setStreet(FormUtil.readString("Street"));
+				apartment.setStreetNumber(FormUtil.readString("Street Number"));
+				apartment.setAgent(agentId);
+				apartment.saveApartment();
+				System.out.println("Apartment with ID " + apartment.getId() + " has been created.");
 				break;
 			default:
 				System.out.println("Invalid choice.");
 				return;
 		}
-
-		System.out.println("Create new estate:");
-		estate.setSquare(FormUtil.readDouble("Square"));
-		estate.setCity(FormUtil.readString("City"));
-		estate.setPostalCode(FormUtil.readString("Postal Code"));
-		estate.setStreet(FormUtil.readString("Street"));
-		estate.setStreetNumber(FormUtil.readString("Street Number"));
-
-		estate.setAgent(agentId);
-		estate.save();
-
-		System.out.println("Estate with ID " + estate.getId() + " has been created.");
 	}
 
-	private static void updateEstate() {
+	private static void updateEstate(int agentId) {
 		listEstates();
-		int idToUpdate = FormUtil.readInt("ID of estate");
+		;
+		System.out.println("Which type of estate do you want to update?");
+		System.out.println("1. House");
+		System.out.println("2. Apartment");
+		int estateTypeChoice = FormUtil.readInt("Your choice");
+		int idToUpdate = -1;
+		switch (estateTypeChoice) {
+			case 1:
+				idToUpdate = FormUtil.readInt("ID of house");
+				House house = House.loadHouse(idToUpdate);
+				house.setFloors(FormUtil.readInt("Number of Floors"));
+				house.setPrice(FormUtil.readDouble("Price"));
+				house.setHasGarden(FormUtil.readBoolean("Has Garden (true/false)"));
+				house.setSquare(FormUtil.readDouble("Square in m^2"));
+				house.setCity(FormUtil.readString("City"));
+				house.setPostalCode(FormUtil.readString("Postal Code"));
+				house.setStreet(FormUtil.readString("Street"));
+				house.setStreetNumber(FormUtil.readString("Street Number"));
+				house.setAgent(agentId);
+				house.saveHouse();
+				System.out.println("House with ID " + house.getId() + " has been updated.");
 
-		if (!isExistingEstateId(idToUpdate)) {
-			System.out.println("Estate with ID " + idToUpdate + " does not exist.");
-			return;
+				break;
+			case 2:
+				idToUpdate = FormUtil.readInt("ID of apartment");
+				Apartment apartment = Apartment.loadApartment(idToUpdate);
+				apartment.setFloor(FormUtil.readInt("Floor"));
+				apartment.setRent(FormUtil.readDouble("Rent"));
+				apartment.setRooms(FormUtil.readInt("Rooms"));
+				apartment.setHasBalcony(FormUtil.readBoolean("Has Balcony (true/false)"));
+				apartment.setHasKitchen(FormUtil.readBoolean("Has Kitchen (true/false)"));
+				apartment.setSquare(FormUtil.readDouble("Square in m^2"));
+				apartment.setCity(FormUtil.readString("City"));
+				apartment.setPostalCode(FormUtil.readString("Postal Code"));
+				apartment.setStreet(FormUtil.readString("Street"));
+				apartment.setStreetNumber(FormUtil.readString("Street Number"));
+				apartment.setAgent(agentId);
+				apartment.saveApartment();
+				System.out.println("Apartment with ID " + apartment.getId() + " has been updated.");
+				break;
+			default:
+				System.out.println("Invalid choice.");
+				return;
 		}
-
-		Estate estate = Estate.load(idToUpdate);
-
-		System.out.println("Update Estate with ID " + estate.getId());
-		estate.setCity(FormUtil.readString("City"));
-		estate.setPostalCode(FormUtil.readString("Postal Code"));
-		estate.setStreet(FormUtil.readString("Street"));
-		estate.setStreetNumber(FormUtil.readString("Street Number"));
-
-		estate.save();
-
 		listEstates();
 	}
 
 	private static void deleteEstate() {
 		listEstates();
-		int idToDelete = FormUtil.readInt("ID of estate to delete");
+		;
+		System.out.println("Which type of estate do you want to delete?");
+		System.out.println("1. House");
+		System.out.println("2. Apartment");
+		int estateTypeChoice = FormUtil.readInt("Your choice");
+		int idToUpdate = -1;
+		switch (estateTypeChoice) {
+			case 1:
+				idToUpdate = FormUtil.readInt("ID of house");
+				House house = House.loadHouse(idToUpdate);
+				house.deleteHouse();
+				System.out.println("House with ID " + house.getId() + " has been updated.");
 
-		if (!isExistingEstateId(idToDelete)) {
-			System.out.println("Estate with ID " + idToDelete + " does not exist.");
-			return;
+				break;
+			case 2:
+				idToUpdate = FormUtil.readInt("ID of apartment");
+				Apartment apartment = Apartment.loadApartment(idToUpdate);
+				apartment.deleteApartment();
+				System.out.println("Apartment with ID " + apartment.getId() + " has been updated.");
+				break;
+			default:
+				System.out.println("Invalid choice.");
+				return;
 		}
-
-		Estate estate = Estate.load(idToDelete);
-
-		if (estate instanceof House) {
-			((House) estate).delete();
-		} else if (estate instanceof Apartment) {
-			((Apartment) estate).delete();
-		} else {
-			System.out.println("Estate with ID " + idToDelete + " could not be deleted.");
-		}
-
-		System.out.println("Estate with ID " + idToDelete + " has been deleted.");
 		listEstates();
 	}
 
@@ -323,24 +349,45 @@ public class Main {
 	}
 
 	private static void createContract() {
-		Contract contract = new Contract();
+		System.out.println("Which type of contract do you want to create?");
+		System.out.println("1. Tenancy Contract");
+		System.out.println("2. Purchase Contract");
+		int contractChoice = FormUtil.readInt("Your choice");
 
-		System.out.println("Create New Contract:");
-		contract.setDate(FormUtil.readDate("Date (yyyy-MM-dd)"));
-		contract.setPlace(FormUtil.readString("Place"));
+		switch (contractChoice) {
+			case 1:
+				TenancyContract tenancyContract = new TenancyContract();
+				tenancyContract.setPlace(FormUtil.readString("Place"));
+				tenancyContract.setDate(FormUtil.readDate("Date (yyyy-mm-dd)"));
+				tenancyContract.setStartDate(FormUtil.readDate("Start Date"));
+				tenancyContract.setDuration(FormUtil.readDouble("Duration in years (yyyy-mm-dd)"));
+				tenancyContract.setAdditionalCosts(FormUtil.readInt("Additional Costs"));
+				tenancyContract.saveTenancyContract();
+				System.out.println("Teneancy Contract with ID " + tenancyContract.getId() + " has been created.");
+				break;
+			case 2:
+				PurchaseContract purchaseContract = new PurchaseContract();
+				purchaseContract.setDate(FormUtil.readDate("Date (yyyy-mm-dd)"));
+				purchaseContract.setPlace(FormUtil.readString("Place"));
+				purchaseContract.setInterestRate(FormUtil.readDouble("Interest Rate (%)"));
+				purchaseContract.setNumberOfInstallments(FormUtil.readInt("Installments Number"));
 
-		contract.save();
-
-		System.out.println("Contract with ID " + contract.getId() + " has been created.");
+				purchaseContract.savePurchaseContract();
+				System.out.println("Purchase Contract with ID " + purchaseContract.getId() + " has been created.");
+				break;
+			default:
+				System.out.println("Invalid choice.");
+				return;
+		}
 	}
 
 	private static void addPerson() {
 		Person person = new Person();
 
 		System.out.println("Add New Person:");
-		person.setFirstName(FormUtil.readString("First Name: "));
-		person.setLastName(FormUtil.readString("Last Name: "));
-		person.setAddress(FormUtil.readString("Address: "));
+		person.setFirstName(FormUtil.readString("First Name"));
+		person.setLastName(FormUtil.readString("Last Name"));
+		person.setAddress(FormUtil.readString("Address"));
 
 		person.save();
 
@@ -352,7 +399,7 @@ public class Main {
 		if (contracts != null && !contracts.isEmpty()) {
 			for (Contract contract : contracts) {
 				System.out.println("Contract ID: " + contract.getId());
-				System.out.println("Date: " + contract.getDate());
+				System.out.println("Date (yyyy-mm-dd): " + contract.getDate());
 				System.out.println("Place: " + contract.getPlace());
 				System.out.println("------------------------");
 			}
@@ -379,6 +426,11 @@ public class Main {
 		if (estates != null && !estates.isEmpty()) {
 			for (Estate estate : estates) {
 				System.out.println("Estate ID: " + estate.getId());
+				System.out.println("Agent ID: " + estate.getAgent());
+				System.out.println("Postalcode: " + estate.getPostalCode());
+				System.out.println("City: " + estate.getCity());
+				System.out.println("Street: " + estate.getStreet());
+				System.out.println("Streetnumber: " + estate.getStreetNumber());
 				System.out.println("------------------------");
 			}
 		} else {

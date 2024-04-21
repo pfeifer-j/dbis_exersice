@@ -1,12 +1,10 @@
-package de.dis.data.done;
+package de.dis.data;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import de.dis.data.DbConnectionManager;
 
 public class Apartment extends Estate {
     private int floor;
@@ -69,7 +67,7 @@ public class Apartment extends Estate {
         this.hasKitchen = hasKitchen;
     }
 
-    public static Apartment load(int id) {
+    public static Apartment loadApartment(int id) {
         Apartment apartment = null;
         try {
             Connection con = DbConnectionManager.getInstance().getConnection();
@@ -96,29 +94,33 @@ public class Apartment extends Estate {
         return apartment;
     }
 
-    public void save() {
+    public void saveApartment() {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
             if (getId() == -1) {
-                String insertSQL = "INSERT INTO estate (square, agent_id) VALUES (?, ?)";
+                String insertSQL = "INSERT INTO estate (square, agent_id, city, street, streetnumber, postalcode) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
                 pstmt.setDouble(1, getSquare());
                 pstmt.setInt(2, getAgent());
+                pstmt.setString(3, getCity());
+                pstmt.setString(4, getStreet());
+                pstmt.setString(5, getStreetNumber());
+                pstmt.setString(6, getPostalCode());
                 pstmt.executeUpdate();
 
                 ResultSet rs = pstmt.getGeneratedKeys();
-                int estateId = -1;
+                int id = -1;
                 if (rs.next()) {
-                    estateId = rs.getInt(1);
-                    this.setId(estateId);
+                    id = rs.getInt(1);
+                    this.setId(id);
                 }
                 rs.close();
                 pstmt.close();
 
-                if (estateId != -1) {
+                if (id != -1) {
                     String insertApartmentSQL = "INSERT INTO apartment (id, floor, rent, rooms, balcony, kitchen) VALUES (?, ?, ?, ?, ?, ?)";
                     PreparedStatement pstmtApartment = con.prepareStatement(insertApartmentSQL);
-                    pstmtApartment.setInt(1, estateId);
+                    pstmtApartment.setInt(1, id);
                     pstmtApartment.setInt(2, getFloor());
                     pstmtApartment.setDouble(3, getRent());
                     pstmtApartment.setInt(4, getRooms());
@@ -128,11 +130,15 @@ public class Apartment extends Estate {
                     pstmtApartment.close();
                 }
             } else {
-                String updateSQL = "UPDATE estate SET square = ?, agent_id = ? WHERE id = ?";
+                String updateSQL = "UPDATE estate SET square = ?, agent_id = ?, city = ?, street = ?, streetnumber = ?, postalcode = ? WHERE id = ?";
                 PreparedStatement pstmt = con.prepareStatement(updateSQL);
                 pstmt.setDouble(1, getSquare());
                 pstmt.setInt(2, getAgent());
-                pstmt.setInt(3, getId());
+                pstmt.setString(3, getCity());
+                pstmt.setString(4, getStreet());
+                pstmt.setString(5, getStreetNumber());
+                pstmt.setString(6, getPostalCode());
+                pstmt.setInt(7, getId());
                 pstmt.executeUpdate();
                 pstmt.close();
 
@@ -152,7 +158,7 @@ public class Apartment extends Estate {
         }
     }
 
-    public void delete() {
+    public void deleteApartment() {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
             String deleteApartmentSQL = "DELETE FROM apartment WHERE id = ?";

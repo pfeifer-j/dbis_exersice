@@ -1,12 +1,10 @@
-package de.dis.data.done;
+package de.dis.data;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import de.dis.data.DbConnectionManager;
 
 public class Person {
     private int id = -1;

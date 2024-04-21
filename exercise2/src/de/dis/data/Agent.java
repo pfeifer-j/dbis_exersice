@@ -1,4 +1,4 @@
-package de.dis.data.done;
+package de.dis.data;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import de.dis.data.DbConnectionManager;
 
 /**
  * Real Estate Agent Bean
@@ -25,7 +23,7 @@ public class Agent {
 	private int id = -1;
 	private String name;
 	// private Address address;
-	private String oldAddress;
+	private String address;
 	private String login;
 	private String password="";
 
@@ -45,12 +43,12 @@ public class Agent {
 		this.name = name;
 	}
 
-	public String getOldAddress(){
-		return oldAddress;
+	public String getAddress(){
+		return address;
 	}
 
-	public void setOldAddress(String oldAddress){
-		this.oldAddress = oldAddress;
+	public void setAddress(String oldAddress){
+		this.address = oldAddress;
 	}
 
 	/*
@@ -102,7 +100,7 @@ public class Agent {
 			if (rs.next()) {
 				ts.setId(id);
 				ts.setName(rs.getString("name"));
-				ts.setOldAddress(rs.getString("address"));
+				ts.setAddress(rs.getString("address"));
 				ts.setLogin(rs.getString("login"));
 				ts.setPassword(rs.getString("password"));
 
@@ -138,7 +136,7 @@ public class Agent {
 			if (rs.next()) {
 				ts.setId(rs.getInt("id"));
 				ts.setName(rs.getString("name"));
-				ts.setOldAddress(rs.getString("address"));
+				ts.setAddress(rs.getString("address"));
 				ts.setLogin(rs.getString("login"));
 				ts.setPassword(rs.getString("password"));
 
@@ -193,7 +191,7 @@ public class Agent {
 				String insertAgentSQL = "INSERT INTO estate_agent(name, address, login, password) VALUES (?, ?, ?, ?)";
 				PreparedStatement agentPstmt = con.prepareStatement(insertAgentSQL, Statement.RETURN_GENERATED_KEYS);
 				agentPstmt.setString(1, getName());
-				agentPstmt.setString(2, getOldAddress());
+				agentPstmt.setString(2, getAddress());
 				agentPstmt.setString(3, getLogin());
 				agentPstmt.setString(4, getPassword());
 				agentPstmt.executeUpdate();
@@ -210,7 +208,7 @@ public class Agent {
 				String updateAgentSQL = "UPDATE estate_agent SET name = ?, address = ?, login = ?, password = ? WHERE id = ?";
 				PreparedStatement agentUpdatePstmt = con.prepareStatement(updateAgentSQL);
 				agentUpdatePstmt.setString(1, getName());
-				agentUpdatePstmt.setString(2, getOldAddress());
+				agentUpdatePstmt.setString(2, getAddress());
 				agentUpdatePstmt.setString(3, getLogin());
 				agentUpdatePstmt.setString(4, getPassword());
 				agentUpdatePstmt.setInt(5, getId());

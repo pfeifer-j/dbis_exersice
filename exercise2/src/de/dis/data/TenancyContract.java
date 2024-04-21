@@ -12,6 +12,18 @@ public class TenancyContract extends Contract {
     private double duration;
     private double additionalCosts;
 
+    public TenancyContract(int contractNumber, Date date, String place, Date startDate, double duration,
+            double additionalCosts) {
+        super();
+        this.startDate = startDate;
+        this.duration = duration;
+        this.additionalCosts = additionalCosts;
+    }
+
+    public TenancyContract() {
+        super();
+    }
+
     public Date getStartDate() {
         return startDate;
     }
@@ -36,51 +48,71 @@ public class TenancyContract extends Contract {
         this.additionalCosts = additionalCosts;
     }
 
-    @Override
-    public void save() {
+    public void saveTenancyContract() {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
             if (getId() == -1) {
-                String insertSQL = "INSERT INTO tenancy_contract (start_date, duration, additional_costs, number) VALUES (?, ?, ?, ?)";
+
+                String insertSQL = "INSERT INTO contract (date, place) VALUES (?, ?)";
                 PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
-                pstmt.setDate(1, startDate);
-                pstmt.setDouble(2, duration);
-                pstmt.setDouble(3, additionalCosts);
-                pstmt.setInt(4, getId());
+                pstmt.setDate(1, getDate());
+                pstmt.setString(2, getPlace());
                 pstmt.executeUpdate();
 
                 ResultSet rs = pstmt.getGeneratedKeys();
+                int id = -1;
                 if (rs.next()) {
-                    setId(rs.getInt(1));
+                    id = rs.getInt(1);
+                    setId(id);
                 }
                 rs.close();
                 pstmt.close();
+
+                if (id != -1) {
+                    String insertTenancy = "INSERT INTO tenancy_contract (start_date, duration, additional_costs, id) VALUES (?, ?, ?, ?)";
+                    PreparedStatement pstmtTenancy = con.prepareStatement(insertTenancy, Statement.RETURN_GENERATED_KEYS);
+                    pstmtTenancy.setDate(1, startDate);
+                    pstmtTenancy.setDouble(2, duration);
+                    pstmtTenancy.setDouble(3, additionalCosts);
+                    pstmtTenancy.setInt(4, getId());
+                    pstmtTenancy.executeUpdate();
+                    pstmtTenancy.close();
+                }
             } else {
-                String updateSQL = "UPDATE tenancy_contract SET start_date = ?, duration = ?, additional_costs = ? WHERE number = ?";
-                PreparedStatement pstmt = con.prepareStatement(updateSQL);
-                pstmt.setDate(1, startDate);
-                pstmt.setDouble(2, duration);
-                pstmt.setDouble(3, additionalCosts);
-                pstmt.setInt(4, getId());
+                String insertSQL = "UPDATE contract SET date = ?, place = ? WHERE contract_number = ?";
+                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setDate(1, getDate());
+                pstmt.setString(2, getPlace());
+                pstmt.setInt(2, getId());
                 pstmt.executeUpdate();
-                pstmt.close();
+
+                String updateSQL = "UPDATE tenancy_contract SET start_date = ?, duration = ?, additional_costs = ? WHERE id = ?";
+                PreparedStatement pstmtTenancy = con.prepareStatement(updateSQL);
+                pstmtTenancy.setDate(1, startDate);
+                pstmtTenancy.setDouble(2, duration);
+                pstmtTenancy.setDouble(3, additionalCosts);
+                pstmtTenancy.setInt(4, getId());
+                pstmtTenancy.executeUpdate();
+                pstmtTenancy.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static TenancyContract load(int contractNumber) {
+    public static TenancyContract loadTenancyContract(int contractNumber) {
         TenancyContract contract = null;
         try {
             Connection con = DbConnectionManager.getInstance().getConnection();
-            String selectSQL = "SELECT * FROM tenancy_contract WHERE number = ?";
+            String selectSQL = "SELECT * FROM contract JOIN tenancy_contract ON contract.contract_number = tenancy_contract.id WHERE contract.contract_number = ?";
             PreparedStatement pstmt = con.prepareStatement(selectSQL);
             pstmt.setInt(1, contractNumber);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 contract = new TenancyContract();
-                contract.setId(contractNumber);
+                contract.setId(rs.getInt("contract_number"));
+                contract.setStartDate(rs.getDate("date"));
+                contract.setPlace(rs.getString("place"));
                 contract.setStartDate(rs.getDate("start_date"));
                 contract.setDuration(rs.getDouble("duration"));
                 contract.setAdditionalCosts(rs.getDouble("additional_costs"));
