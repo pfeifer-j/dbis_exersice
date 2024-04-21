@@ -356,23 +356,34 @@ public class Main {
 
 		switch (contractChoice) {
 			case 1:
+				listTenancyContracts();
 				TenancyContract tenancyContract = new TenancyContract();
 				tenancyContract.setPlace(FormUtil.readString("Place"));
 				tenancyContract.setDate(FormUtil.readDate("Date (yyyy-mm-dd)"));
 				tenancyContract.setStartDate(FormUtil.readDate("Start Date"));
-				tenancyContract.setDuration(FormUtil.readDouble("Duration in years (yyyy-mm-dd)"));
+				tenancyContract.setDuration(FormUtil.readDouble("Duration in years"));
 				tenancyContract.setAdditionalCosts(FormUtil.readInt("Additional Costs"));
 				tenancyContract.saveTenancyContract();
+
+				int personId = FormUtil.readInt("ID of Tenant");
+				int apartmentId = FormUtil.readInt("ID of Apartment");
+				tenancyContract.rents(apartmentId, personId);
+
 				System.out.println("Teneancy Contract with ID " + tenancyContract.getId() + " has been created.");
 				break;
 			case 2:
+				listPurchaseContracts();
 				PurchaseContract purchaseContract = new PurchaseContract();
 				purchaseContract.setDate(FormUtil.readDate("Date (yyyy-mm-dd)"));
 				purchaseContract.setPlace(FormUtil.readString("Place"));
 				purchaseContract.setInterestRate(FormUtil.readDouble("Interest Rate (%)"));
 				purchaseContract.setNumberOfInstallments(FormUtil.readInt("Installments Number"));
-
 				purchaseContract.savePurchaseContract();
+
+				int sellerId = FormUtil.readInt("ID of Seller");
+				int houseId = FormUtil.readInt("ID of Apartment");
+				purchaseContract.sells(houseId, sellerId);
+
 				System.out.println("Purchase Contract with ID " + purchaseContract.getId() + " has been created.");
 				break;
 			default:
@@ -395,17 +406,16 @@ public class Main {
 	}
 
 	private static void listContracts() {
-		List<Contract> contracts = Contract.loadAll();
-		if (contracts != null && !contracts.isEmpty()) {
-			for (Contract contract : contracts) {
-				System.out.println("Contract ID: " + contract.getId());
-				System.out.println("Date (yyyy-mm-dd): " + contract.getDate());
-				System.out.println("Place: " + contract.getPlace());
-				System.out.println("------------------------");
-			}
-		} else {
-			System.out.println("No contracts found.");
-		}
+		listTenancyContracts();
+		listPurchaseContracts();
+	}
+
+	private static void listTenancyContracts(){
+		System.out.println(TenancyContract.loadOverview());
+	}
+
+	private static void listPurchaseContracts(){
+		// System.out.println(PurchaseContract.loadOverview());
 	}
 
 	private static void listAgents() {

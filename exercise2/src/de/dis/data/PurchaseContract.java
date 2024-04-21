@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PurchaseContract extends Contract {
     private int numberOfInstallments;
@@ -114,5 +116,88 @@ public class PurchaseContract extends Contract {
         }
         return contract;
     }
-    
+
+    public void sells(int sellerId, int houseId){
+        Connection con = DbConnectionManager.getInstance().getConnection();
+        try {
+            if (getId() == -1) {
+                String insertSQL = "INSERT INTO sells (seller_id, house_id, contract_number) VALUES (?, ?, ?)";
+                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setInt(1, sellerId);
+                pstmt.setInt(2, houseId);
+                pstmt.setInt(2, getId());
+                pstmt.executeUpdate();
+
+            } else {
+                String insertSQL = "UPDATE sells SET seller_id = ?, house_id = ? WHERE contract_number = ?";
+                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setInt(1, sellerId);
+                pstmt.setInt(2, houseId);
+                pstmt.setInt(2, getId());
+                pstmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void rents(int tenantId, int apartmentId){
+        Connection con = DbConnectionManager.getInstance().getConnection();
+        try {
+            if (getId() == -1) {
+                String insertSQL = "INSERT INTO rents (tenant_id, apartment_id, contract_number) VALUES (?, ?, ?)";
+                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setInt(1, tenantId);
+                pstmt.setInt(2, apartmentId);
+                pstmt.setInt(2, getId());
+                pstmt.executeUpdate();
+                pstmt.close();
+
+            } else {
+                String insertSQL = "UPDATE rents SET tenant_id = ?, apartment_id = ? WHERE contract_number = ?";
+                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setInt(1, tenantId);
+                pstmt.setInt(2, apartmentId);
+                pstmt.setInt(3, getId());
+                pstmt.executeUpdate();
+                pstmt.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public static String loadOverview() {
+        List<String> overviews = new ArrayList<>();
+        try {
+            Connection con = DbConnectionManager.getInstance().getConnection();
+            String selectSQL = "SELECT c.*, t.start_date, t.duration, t.additional_costs, r.tenant_id, r.apartment_id " +
+                               "FROM contract c " +
+                               "JOIN purchase_contract t ON c.contract_number = t.id " +
+                               "JOIN rents r ON c.contract_number = r.contract_number";
+
+            PreparedStatement pstmt = con.prepareStatement(selectSQL);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                StringBuilder overview = new StringBuilder();
+                overview.append("Contract Number: ").append(rs.getInt("contract_number")).append("\n");
+                overview.append("Date: ").append(rs.getDate("date")).append("\n");
+                overview.append("Place: ").append(rs.getString("place")).append("\n");
+                overview.append("Start Date: ").append(rs.getDate("start_date")).append("\n");
+                overview.append("Duration: ").append(rs.getDouble("duration")).append("\n");
+                overview.append("Additional Costs: ").append(rs.getDouble("additional_costs")).append("\n");
+                overview.append("Tenant ID: ").append(rs.getInt("tenant_id")).append("\n");
+                overview.append("Apartment ID: ").append(rs.getInt("apartment_id")).append("\n");
+
+                overviews.add(overview.toString());
+            }
+
+            rs.close();
+            pstmt.close();
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return String.join("\n", overviews);
+    }
 }
