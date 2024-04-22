@@ -381,7 +381,7 @@ public class Main {
 				purchaseContract.savePurchaseContract();
 
 				int sellerId = FormUtil.readInt("ID of Seller");
-				int houseId = FormUtil.readInt("ID of Apartment");
+				int houseId = FormUtil.readInt("ID of House");
 				purchaseContract.sells(houseId, sellerId);
 
 				System.out.println("Purchase Contract with ID " + purchaseContract.getId() + " has been created.");
@@ -415,7 +415,7 @@ public class Main {
 	}
 
 	private static void listPurchaseContracts(){
-		// System.out.println(PurchaseContract.loadOverview());
+		 System.out.println(PurchaseContract.loadOverview());
 	}
 
 	private static void listAgents() {

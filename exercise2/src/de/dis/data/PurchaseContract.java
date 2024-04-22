@@ -170,28 +170,29 @@ public class PurchaseContract extends Contract {
         List<String> overviews = new ArrayList<>();
         try {
             Connection con = DbConnectionManager.getInstance().getConnection();
-            String selectSQL = "SELECT c.*, t.start_date, t.duration, t.additional_costs, r.tenant_id, r.apartment_id " +
-                               "FROM contract c " +
-                               "JOIN purchase_contract t ON c.contract_number = t.id " +
-                               "JOIN rents r ON c.contract_number = r.contract_number";
-
+            String selectSQL = "SELECT sells.contract_number, sells.seller_id, sells.house_id, " +
+                    "contract.date, contract.place, purchase_contract.interest_rate, " +
+                    "purchase_contract.number_of_installments " +
+                    "FROM sells " +
+                    "INNER JOIN contract ON sells.contract_number = contract.contract_number " +
+                    "INNER JOIN purchase_contract ON sells.contract_number = purchase_contract.id";
+    
             PreparedStatement pstmt = con.prepareStatement(selectSQL);
             ResultSet rs = pstmt.executeQuery();
-
+    
             while (rs.next()) {
                 StringBuilder overview = new StringBuilder();
                 overview.append("Contract Number: ").append(rs.getInt("contract_number")).append("\n");
+                overview.append("Seller ID: ").append(rs.getInt("seller_id")).append("\n");
+                overview.append("House ID: ").append(rs.getInt("house_id")).append("\n");
                 overview.append("Date: ").append(rs.getDate("date")).append("\n");
                 overview.append("Place: ").append(rs.getString("place")).append("\n");
-                overview.append("Start Date: ").append(rs.getDate("start_date")).append("\n");
-                overview.append("Duration: ").append(rs.getDouble("duration")).append("\n");
-                overview.append("Additional Costs: ").append(rs.getDouble("additional_costs")).append("\n");
-                overview.append("Tenant ID: ").append(rs.getInt("tenant_id")).append("\n");
-                overview.append("Apartment ID: ").append(rs.getInt("apartment_id")).append("\n");
-
+                overview.append("Interest Rate: ").append(rs.getDouble("interest_rate")).append("\n");
+                overview.append("Number of Installments: ").append(rs.getInt("number_of_installments")).append("\n");
+    
                 overviews.add(overview.toString());
             }
-
+    
             rs.close();
             pstmt.close();
             con.close();
@@ -200,4 +201,5 @@ public class PurchaseContract extends Contract {
         }
         return String.join("\n", overviews);
     }
+    
 }
