@@ -54,8 +54,8 @@ public class Contract {
                 contract.setPlace(rs.getString("place"));
                 contracts.add(contract);
             }
-            rs.close();
-            pstmt.close();
+            //rs.close();
+            //pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
