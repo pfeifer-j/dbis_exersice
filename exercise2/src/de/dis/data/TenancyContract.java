@@ -67,8 +67,8 @@ public class TenancyContract extends Contract {
                     id = rs.getInt(1);
                     setId(id);
                 }
-                rs.close();
-                pstmt.close();
+                //rs.close();
+                //pstmt.close();
 
                 if (id != -1) {
                     String insertTenancy = "INSERT INTO tenancy_contract (start_date, duration, additional_costs, id) VALUES (?, ?, ?, ?)";
@@ -78,7 +78,7 @@ public class TenancyContract extends Contract {
                     pstmtTenancy.setDouble(3, additionalCosts);
                     pstmtTenancy.setInt(4, getId());
                     pstmtTenancy.executeUpdate();
-                    pstmtTenancy.close();
+                    //pstmtTenancy.close();
                 }
             } else {
                 String insertSQL = "UPDATE contract SET date = ?, place = ? WHERE contract_number = ?";
@@ -95,7 +95,7 @@ public class TenancyContract extends Contract {
                 pstmtTenancy.setDouble(3, additionalCosts);
                 pstmtTenancy.setInt(4, getId());
                 pstmtTenancy.executeUpdate();
-                pstmtTenancy.close();
+                //pstmtTenancy.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -119,8 +119,8 @@ public class TenancyContract extends Contract {
                 contract.setDuration(rs.getDouble("duration"));
                 contract.setAdditionalCosts(rs.getDouble("additional_costs"));
             }
-            rs.close();
-            pstmt.close();
+            //rs.close();
+            //pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -137,7 +137,7 @@ public class TenancyContract extends Contract {
                 pstmt.setInt(2, apartmentId);
                 pstmt.setInt(2, getId());
                 pstmt.executeUpdate();
-                pstmt.close();
+                //pstmt.close();
 
             } else {
                 String insertSQL = "UPDATE rents SET tenant_id = ?, apartment_id = ? WHERE contract_number = ?";
@@ -146,7 +146,7 @@ public class TenancyContract extends Contract {
                 pstmt.setInt(2, apartmentId);
                 pstmt.setInt(3, getId());
                 pstmt.executeUpdate();
-                pstmt.close();
+                //pstmt.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -179,9 +179,9 @@ public class TenancyContract extends Contract {
                 overviews.add(overview.toString());
             }
 
-            rs.close();
-            pstmt.close();
-            con.close();
+            //rs.close();
+            //pstmt.close();
+            //con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
