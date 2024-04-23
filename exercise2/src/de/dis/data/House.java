@@ -15,8 +15,9 @@ public class House extends Estate {
         super();
     }
 
-    public House(int id, double square, int agent, int floors, double price, boolean hasGarden, String street, String streetNumber, String city, String postalCode) {
-        super(id, square, agent, street, streetNumber, city, postalCode );
+    public House(int id, double square, int agent, int floors, double price, boolean hasGarden, String street,
+            String streetNumber, String city, String postalCode) {
+        super(id, square, agent, street, streetNumber, city, postalCode);
         this.floors = floors;
         this.price = price;
         this.hasGarden = hasGarden;
@@ -74,7 +75,9 @@ public class House extends Estate {
             e.printStackTrace();
         }
         return house;
-    }public void saveHouse() {
+    }
+
+    public void saveHouse() {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
             if (getId() == -1) {
@@ -88,7 +91,7 @@ public class House extends Estate {
                 pstmt.setString(5, getStreetNumber());
                 pstmt.setString(6, getPostalCode());
                 pstmt.executeUpdate();
-    
+
                 ResultSet rs = pstmt.getGeneratedKeys();
                 int id = -1;
                 if (rs.next()) {
@@ -97,7 +100,7 @@ public class House extends Estate {
                 }
                 rs.close();
                 pstmt.close();
-    
+
                 if (id != -1) {
                     String insertHouseSQL = "INSERT INTO house (id, floors, price, garden) VALUES (?, ?, ?, ?)";
                     PreparedStatement pstmtHouse = con.prepareStatement(insertHouseSQL);
@@ -120,7 +123,7 @@ public class House extends Estate {
                 pstmt.setInt(7, getId());
                 pstmt.executeUpdate();
                 pstmt.close();
-    
+
                 String updateHouseSQL = "UPDATE house SET floors = ?, price = ?, garden = ? WHERE id = ?";
                 PreparedStatement pstmtHouse = con.prepareStatement(updateHouseSQL);
                 pstmtHouse.setInt(1, getFloors());
@@ -134,7 +137,7 @@ public class House extends Estate {
             e.printStackTrace();
         }
     }
-    
+
     public void deleteHouse() {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {

@@ -130,16 +130,16 @@ public class TenancyContract extends Contract {
     public void rents(int tenantId, int apartmentId){
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
-            if (getId() == -1) {
+            // if (getId() == -1) {
                 String insertSQL = "INSERT INTO rents (tenant_id, apartment_id, contract_number) VALUES (?, ?, ?)";
                 PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
                 pstmt.setInt(1, tenantId);
                 pstmt.setInt(2, apartmentId);
-                pstmt.setInt(2, getId());
+                pstmt.setInt(3, getId());
                 pstmt.executeUpdate();
                 pstmt.close();
 
-            } else {
+            /* else {
                 String insertSQL = "UPDATE rents SET tenant_id = ?, apartment_id = ? WHERE contract_number = ?";
                 PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
                 pstmt.setInt(1, tenantId);
@@ -147,7 +147,7 @@ public class TenancyContract extends Contract {
                 pstmt.setInt(3, getId());
                 pstmt.executeUpdate();
                 pstmt.close();
-            }
+            }*/
         } catch (SQLException e) {
             e.printStackTrace();
         }
