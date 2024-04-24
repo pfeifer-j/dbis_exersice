@@ -124,7 +124,7 @@ public class PurchaseContract extends Contract {
     public void sells(int sellerId, int houseId){
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
-            if (getId() == -1) {
+            //if (getId() == -1) {
                 System.err.println("Inserting into sells table...");
                 String insertSQL = "INSERT INTO sells (seller_id, house_id, contract_number) VALUES (?, ?, ?)";
                 PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
@@ -133,14 +133,14 @@ public class PurchaseContract extends Contract {
                 pstmt.setInt(3, getId());
                 pstmt.executeUpdate();
 
-            } else {
+            /*} else {
                 String insertSQL = "UPDATE sells SET seller_id = ?, house_id = ? WHERE contract_number = ?";
                 PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
                 pstmt.setInt(1, sellerId);
                 pstmt.setInt(2, houseId);
                 pstmt.setInt(3, getId());
                 pstmt.executeUpdate();
-            }
+            }*/
         } catch (SQLException e) {
             System.err.println("ERROR: connection to database failed!");
             e.printStackTrace();
@@ -195,7 +195,8 @@ public class PurchaseContract extends Contract {
                 overview.append("Place: ").append(rs.getString("place")).append("\n");
                 overview.append("Interest Rate: ").append(rs.getDouble("interest_rate")).append("\n");
                 overview.append("Number of Installments: ").append(rs.getInt("number_of_installments")).append("\n");
-    
+                overview.append("---------------------------------------------------");
+
                 overviews.add(overview.toString());
             }
     

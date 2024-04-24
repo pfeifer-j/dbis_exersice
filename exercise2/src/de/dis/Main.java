@@ -382,7 +382,7 @@ public class Main {
 
 				int sellerId = FormUtil.readInt("ID of Seller");
 				int houseId = FormUtil.readInt("ID of House");
-				purchaseContract.sells(houseId, sellerId);
+				purchaseContract.sells(sellerId, houseId);
 
 				System.out.println("Purchase Contract with ID " + purchaseContract.getId() + " has been created.");
 				break;

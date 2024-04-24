@@ -147,7 +147,7 @@ public class TenancyContract extends Contract {
                 pstmt.setInt(3, getId());
                 pstmt.executeUpdate();
                 //pstmt.close();
-            }
+            }*/
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -168,13 +168,15 @@ public class TenancyContract extends Contract {
             while (rs.next()) {
                 StringBuilder overview = new StringBuilder();
                 overview.append("Contract Number: ").append(rs.getInt("contract_number")).append("\n");
+                overview.append("Tenant ID: ").append(rs.getInt("tenant_id")).append("\n");
+                overview.append("Apartment ID: ").append(rs.getInt("apartment_id")).append("\n");
                 overview.append("Date: ").append(rs.getDate("date")).append("\n");
                 overview.append("Place: ").append(rs.getString("place")).append("\n");
                 overview.append("Start Date: ").append(rs.getDate("start_date")).append("\n");
                 overview.append("Duration: ").append(rs.getDouble("duration")).append("\n");
                 overview.append("Additional Costs: ").append(rs.getDouble("additional_costs")).append("\n");
-                overview.append("Tenant ID: ").append(rs.getInt("tenant_id")).append("\n");
-                overview.append("Apartment ID: ").append(rs.getInt("apartment_id")).append("\n");
+                overview.append("---------------------------------------------------");
+
 
                 overviews.add(overview.toString());
             }
