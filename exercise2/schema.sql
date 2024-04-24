@@ -68,7 +68,7 @@ CREATE TABLE purchase_contract (
 CREATE TABLE sells (
     seller_id INT,
     house_id INT,
-    contract_number INT,
+    contract_number INT PRIMARY KEY,
     FOREIGN KEY (seller_id) REFERENCES person(id),
     FOREIGN KEY (house_id) REFERENCES estate(id),
     FOREIGN KEY (contract_number) REFERENCES contract(contract_number)
@@ -77,7 +77,7 @@ CREATE TABLE sells (
 CREATE TABLE rents (
     tenant_id INT,
     apartment_id INT,
-    contract_number INT,
+    contract_number INT PRIMARY KEY,
     FOREIGN KEY (tenant_id) REFERENCES person(id),
     FOREIGN KEY (apartment_id) REFERENCES estate(id),
     FOREIGN KEY (contract_number) REFERENCES contract(contract_number)

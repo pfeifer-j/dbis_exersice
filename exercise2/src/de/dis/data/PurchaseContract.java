@@ -13,12 +13,12 @@ public class PurchaseContract extends Contract {
     private int numberOfInstallments;
     private double interestRate;
 
-    
     public PurchaseContract() {
         super();
     }
 
-    public PurchaseContract(int contractNumber, Date date, String place, int numberOfInstallments, double interestRate) {
+    public PurchaseContract(int contractNumber, Date date, String place, int numberOfInstallments,
+            double interestRate) {
         super();
         this.numberOfInstallments = numberOfInstallments;
         this.interestRate = interestRate;
@@ -52,16 +52,16 @@ public class PurchaseContract extends Contract {
                 pstmt.setString(2, getPlace());
                 System.err.println("Inserting contract into database...");
                 pstmt.executeUpdate();
-    
+
                 ResultSet rs = pstmt.getGeneratedKeys();
                 int id = -1;
                 if (rs.next()) {
                     id = rs.getInt(1);
                     setId(id);
                 }
-                //rs.close();
-                //pstmt.close();
-    
+                // rs.close();
+                // pstmt.close();
+
                 if (id != -1) {
                     // Insert into purchase_contract table
                     String insertPurchase = "INSERT INTO purchase_contract (number_of_installments, interest_rate, id) VALUES (?, ?, ?)";
@@ -70,7 +70,7 @@ public class PurchaseContract extends Contract {
                     pstmtPurchase.setDouble(2, interestRate);
                     pstmtPurchase.setInt(3, getId());
                     pstmtPurchase.executeUpdate();
-                    //pstmtPurchase.close();
+                    // pstmtPurchase.close();
                 }
             } else {
                 // Update existing purchase contract
@@ -81,22 +81,22 @@ public class PurchaseContract extends Contract {
                 pstmt.setInt(3, getId());
                 System.err.println("Updating contract...");
                 pstmt.executeUpdate();
-                //pstmt.close();
-    
+                // pstmt.close();
+
                 String updatePurchase = "UPDATE purchase_contract SET number_of_installments = ?, interest_rate = ? WHERE id = ?";
                 PreparedStatement pstmtPurchase = con.prepareStatement(updatePurchase);
                 pstmtPurchase.setInt(1, numberOfInstallments);
                 pstmtPurchase.setDouble(2, interestRate);
                 pstmtPurchase.setInt(3, getId());
                 pstmtPurchase.executeUpdate();
-                //pstmtPurchase.close();
+                // pstmtPurchase.close();
             }
         } catch (SQLException e) {
             System.err.println("ERROR: failed connecting to data base!");
             e.printStackTrace();
         }
     }
-    
+
     public static PurchaseContract loadPurchaseContract(int contractNumber) {
         PurchaseContract contract = null;
         try {
@@ -113,79 +113,86 @@ public class PurchaseContract extends Contract {
                 contract.setNumberOfInstallments(rs.getInt("number_of_installments"));
                 contract.setInterestRate(rs.getDouble("interest_rate"));
             }
-            //rs.close();
-            //pstmt.close();
+            // rs.close();
+            // pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return contract;
     }
 
-    public void sells(int sellerId, int houseId){
+    public void sells(int sellerId, int houseId) {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
-            //if (getId() == -1) {
-                System.err.println("Inserting into sells table...");
-                String insertSQL = "INSERT INTO sells (seller_id, house_id, contract_number) VALUES (?, ?, ?)";
-                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
-                pstmt.setInt(1, sellerId);
-                pstmt.setInt(2, houseId);
-                pstmt.setInt(3, getId());
-                pstmt.executeUpdate();
+            // if (getId() == -1) {
+            System.err.println("Inserting into sells table...");
+            String insertSQL = "INSERT INTO sells (seller_id, house_id, contract_number) VALUES (?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setInt(1, sellerId);
+            pstmt.setInt(2, houseId);
+            pstmt.setInt(3, getId());
+            pstmt.executeUpdate();
 
-            /*} else {
-                String insertSQL = "UPDATE sells SET seller_id = ?, house_id = ? WHERE contract_number = ?";
-                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
-                pstmt.setInt(1, sellerId);
-                pstmt.setInt(2, houseId);
-                pstmt.setInt(3, getId());
-                pstmt.executeUpdate();
-            }*/
+            /*
+             * } else {
+             * String insertSQL =
+             * "UPDATE sells SET seller_id = ?, house_id = ? WHERE contract_number = ?";
+             * PreparedStatement pstmt = con.prepareStatement(insertSQL,
+             * Statement.RETURN_GENERATED_KEYS);
+             * pstmt.setInt(1, sellerId);
+             * pstmt.setInt(2, houseId);
+             * pstmt.setInt(3, getId());
+             * pstmt.executeUpdate();
+             * }
+             */
         } catch (SQLException e) {
             System.err.println("ERROR: connection to database failed!");
             e.printStackTrace();
         }
     }
 
-    public void rents(int tenantId, int apartmentId){
+    public void rents(int tenantId, int apartmentId) {
         Connection con = DbConnectionManager.getInstance().getConnection();
         try {
-            //if (getId() == -1) {
-                String insertSQL = "INSERT INTO rents (tenant_id, apartment_id, contract_number) VALUES (?, ?, ?)";
-                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
-                pstmt.setInt(1, tenantId);
-                pstmt.setInt(2, apartmentId);
-                pstmt.setInt(3, getId());
-                pstmt.executeUpdate();
-                //pstmt.close();
+            // if (getId() == -1) {
+            String insertSQL = "INSERT INTO rents (tenant_id, apartment_id, contract_number) VALUES (?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setInt(1, tenantId);
+            pstmt.setInt(2, apartmentId);
+            pstmt.setInt(3, getId());
+            pstmt.executeUpdate();
+            // pstmt.close();
 
-            /*} else {
-                String insertSQL = "UPDATE rents SET tenant_id = ?, apartment_id = ? WHERE contract_number = ?";
-                PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
-                pstmt.setInt(1, tenantId);
-                pstmt.setInt(2, apartmentId);
-                pstmt.setInt(3, getId());
-                pstmt.executeUpdate();
-                //pstmt.close();
-            }*/
+            /*
+             * } else {
+             * String insertSQL =
+             * "UPDATE rents SET tenant_id = ?, apartment_id = ? WHERE contract_number = ?";
+             * PreparedStatement pstmt = con.prepareStatement(insertSQL,
+             * Statement.RETURN_GENERATED_KEYS);
+             * pstmt.setInt(1, tenantId);
+             * pstmt.setInt(2, apartmentId);
+             * pstmt.setInt(3, getId());
+             * pstmt.executeUpdate();
+             * //pstmt.close();
+             * }
+             */
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
     public static String loadOverview() {
         List<String> overviews = new ArrayList<>();
         try {
             Connection con = DbConnectionManager.getInstance().getConnection();
-            String selectSQL = "SELECT sells.contract_number, sells.seller_id, sells.house_id, " +
-                    "contract.date, contract.place, purchase_contract.interest_rate, " +
-                    "purchase_contract.number_of_installments " +
-                    "FROM sells " +
-                    "INNER JOIN contract ON sells.contract_number = contract.contract_number " +
-                    "INNER JOIN purchase_contract ON sells.contract_number = purchase_contract.id";
-    
+            String selectSQL = "SELECT contract.*, purchase_contract.*, sells.* " +
+                    "FROM contract " +
+                    "JOIN purchase_contract ON contract.contract_number = purchase_contract.id " +
+                    "JOIN sells ON contract.contract_number = sells.contract_number";
+
             PreparedStatement pstmt = con.prepareStatement(selectSQL);
             ResultSet rs = pstmt.executeQuery();
-    
+
             while (rs.next()) {
                 StringBuilder overview = new StringBuilder();
                 overview.append("Contract Number: ").append(rs.getInt("contract_number")).append("\n");
@@ -199,14 +206,14 @@ public class PurchaseContract extends Contract {
 
                 overviews.add(overview.toString());
             }
-    
-            //rs.close();
-            //pstmt.close();
-            //con.close();
+
+            // rs.close();
+            // pstmt.close();
+            // con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return String.join("\n", overviews);
     }
-    
+
 }
