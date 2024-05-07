@@ -13,7 +13,6 @@ import java.util.concurrent.Executors;
 public class Main {
 
     public static void main(String[] args) throws SQLException, InterruptedException {
-
         // Setup
         Connection i1 = setup_new_connection();
         Statement cs = i1.createStatement();
@@ -27,84 +26,30 @@ public class Main {
 
         Connection c1 = setup_new_connection();
         c1.setAutoCommit(false);
-        c1.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        c1.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-        // c1.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+        c1.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE); // Set isolation level to Serializable
         Connection c2 = setup_new_connection();
         c2.setAutoCommit(false);
-        c2.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        c2.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-        // c2.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+        c2.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE); // Set isolation level to Serializable
 
-        // S1 = r1(x) w2(x) c2 w1(x) r1(x) c1
+        // Transactions
         List<RunnableOperation> operations = new ArrayList<>(Arrays.asList(
-
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 1 FOR SHARE;"),
+                new RunnableOperation(c1, 'r', "SELECT * FROM dissheet3 WHERE id = 1 FOR SHARE;"),
                 new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Mickey' WHERE id = 1;"),
                 new RunnableOperation(c2, 'c', "COMMIT;"),
                 new RunnableOperation(c1, 'w', "UPDATE dissheet3 SET name = name || ' + Max' WHERE id = 1;"),
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 1 FOR SHARE;"),
-                new RunnableOperation(c1, 'c', "COMMIT;")));
+                new RunnableOperation(c1, 'r', "SELECT * FROM dissheet3 WHERE id = 1 FOR SHARE;"),
+                new RunnableOperation(c1, 'c', "COMMIT;"))
+        );
+
         ExecutorService executor_t1 = Executors.newFixedThreadPool(1);
         ExecutorService executor_t2 = Executors.newFixedThreadPool(1);
         for (RunnableOperation op : operations) {
-
-            if (op.c == c1)
-                executor_t1.execute(op);
-
-            if (op.c == c2)
-                executor_t2.execute(op);
-
-            Thread.sleep(250); // Sleep, so the threads in both pools get executed in the desired order
-
-        }
-        executor_t1.shutdown();
-        executor_t2.shutdown();
-
-        // Schedule S2 = r1(x) w2(x) c2 r1(x) c1
-        operations = new ArrayList<>(Arrays.asList(
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 2 FOR SHARE;"),
-                new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Daisy' WHERE id = 2;"),
-                new RunnableOperation(c2, 'c', "COMMIT;"),
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 2 FOR SHARE;"),
-                new RunnableOperation(c1, 'c', "COMMIT;")));
-
-        executor_t1 = Executors.newFixedThreadPool(1);
-        executor_t2 = Executors.newFixedThreadPool(1);
-
-        for (RunnableOperation op : operations) {
             if (op.c == c1)
                 executor_t1.execute(op);
             if (op.c == c2)
                 executor_t2.execute(op);
-            Thread.sleep(250);
+            Thread.sleep(250);  // Sleep, so the threads in both pools get executed in the desired order
         }
-
-        executor_t1.shutdown();
-        executor_t2.shutdown();
-
-        // Schedule S3 = r2(x) w1(x) w1(y) c1 r2(y) w2(x) w2(y) c2
-        operations = new ArrayList<>(Arrays.asList(
-                new RunnableOperation(c2, 'r', "SELECT name FROM dissheet3 WHERE id = 1 FOR SHARE;"),
-                new RunnableOperation(c1, 'w', "UPDATE dissheet3 SET name = 'Mickey' WHERE id = 1;"),
-                new RunnableOperation(c1, 'w', "UPDATE dissheet3 SET name = 'Minnie' WHERE id = 2;"),
-                new RunnableOperation(c1, 'c', "COMMIT;"),
-                new RunnableOperation(c2, 'r', "SELECT name FROM dissheet3 WHERE id = 2 FOR SHARE;"),
-                new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Donald' WHERE id = 1;"),
-                new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Daisy' WHERE id = 2;"),
-                new RunnableOperation(c2, 'c', "COMMIT;")));
-
-        executor_t1 = Executors.newFixedThreadPool(1);
-        executor_t2 = Executors.newFixedThreadPool(1);
-
-        for (RunnableOperation op : operations) {
-            if (op.c == c1)
-                executor_t1.execute(op);
-            if (op.c == c2)
-                executor_t2.execute(op);
-            Thread.sleep(250);
-        }
-
         executor_t1.shutdown();
         executor_t2.shutdown();
 
@@ -115,36 +60,33 @@ public class Main {
 
         System.out.println("Finished all threads");
 
-        // GET Table at the end
+        // Display Table at the end
         Connection i2 = setup_new_connection();
         Statement cs2 = i2.createStatement();
         ResultSet rs = cs2.executeQuery("SELECT id, name FROM dissheet3 ORDER BY id");
         while (rs.next())
             System.out.println(Integer.toString(rs.getInt("id")) + "," + rs.getString("name"));
         cs2.close();
-
     }
 
     public static Connection setup_new_connection() {
-
         try {
-            // Holen der Einstellungen aus der db.properties Datei
+            // Retrieve settings from the db.properties file
             Properties properties = new Properties();
-            FileInputStream stream = new FileInputStream(new File("exercise3\\db.properties"));
+            FileInputStream stream = new FileInputStream(new File("db.properties"));
             properties.load(stream);
             stream.close();
 
             String jdbcUser = properties.getProperty("jdbc_user");
             String jdbcPass = properties.getProperty("jdbc_pass");
             String jdbcUrl = properties.getProperty("jdbc_url");
-            // Verbindung zur Datenbank herstellen
+            // Establish connection to the database
             return DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-
 }
 
 class RunnableOperation implements Runnable {
@@ -154,14 +96,13 @@ class RunnableOperation implements Runnable {
     public final Connection c;
 
     public RunnableOperation(Connection connection, char readwrite, String operation) {
-
         this.readwrite = readwrite;
         this.op = operation;
         this.c = connection;
     }
 
-    public void run() {
-        System.out.println(Thread.currentThread().getName() + "sql = " + op);
+    public void run(){
+        System.out.println(Thread.currentThread().getName() + " SQL = " + op);
         Statement st;
         try {
             st = c.createStatement();
@@ -172,12 +113,11 @@ class RunnableOperation implements Runnable {
             } else if (readwrite == 'w') {
                 st.execute(op);
             } else if (readwrite == 'c') {
-
                 c.commit();
             }
-
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
 }
+

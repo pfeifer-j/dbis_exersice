@@ -10,7 +10,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Main {
+public class main_template {
 
     public static void main(String[] args) throws SQLException, InterruptedException {
 
@@ -27,23 +27,21 @@ public class Main {
 
         Connection c1 = setup_new_connection();
         c1.setAutoCommit(false);
-        c1.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        c1.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        // c1.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         // c1.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
         Connection c2 = setup_new_connection();
         c2.setAutoCommit(false);
-        c2.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        c2.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        // c2.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         // c2.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
         // S1 = r1(x) w2(x) c2 w1(x) r1(x) c1
         List<RunnableOperation> operations = new ArrayList<>(Arrays.asList(
 
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 1 FOR SHARE;"),
+                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 1;"),
                 new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Mickey' WHERE id = 1;"),
                 new RunnableOperation(c2, 'c', "COMMIT;"),
                 new RunnableOperation(c1, 'w', "UPDATE dissheet3 SET name = name || ' + Max' WHERE id = 1;"),
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 1 FOR SHARE;"),
+                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 1;"),
                 new RunnableOperation(c1, 'c', "COMMIT;")));
         ExecutorService executor_t1 = Executors.newFixedThreadPool(1);
         ExecutorService executor_t2 = Executors.newFixedThreadPool(1);
@@ -58,53 +56,6 @@ public class Main {
             Thread.sleep(250); // Sleep, so the threads in both pools get executed in the desired order
 
         }
-        executor_t1.shutdown();
-        executor_t2.shutdown();
-
-        // Schedule S2 = r1(x) w2(x) c2 r1(x) c1
-        operations = new ArrayList<>(Arrays.asList(
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 2 FOR SHARE;"),
-                new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Daisy' WHERE id = 2;"),
-                new RunnableOperation(c2, 'c', "COMMIT;"),
-                new RunnableOperation(c1, 'r', "SELECT name FROM dissheet3 WHERE id = 2 FOR SHARE;"),
-                new RunnableOperation(c1, 'c', "COMMIT;")));
-
-        executor_t1 = Executors.newFixedThreadPool(1);
-        executor_t2 = Executors.newFixedThreadPool(1);
-
-        for (RunnableOperation op : operations) {
-            if (op.c == c1)
-                executor_t1.execute(op);
-            if (op.c == c2)
-                executor_t2.execute(op);
-            Thread.sleep(250);
-        }
-
-        executor_t1.shutdown();
-        executor_t2.shutdown();
-
-        // Schedule S3 = r2(x) w1(x) w1(y) c1 r2(y) w2(x) w2(y) c2
-        operations = new ArrayList<>(Arrays.asList(
-                new RunnableOperation(c2, 'r', "SELECT name FROM dissheet3 WHERE id = 1 FOR SHARE;"),
-                new RunnableOperation(c1, 'w', "UPDATE dissheet3 SET name = 'Mickey' WHERE id = 1;"),
-                new RunnableOperation(c1, 'w', "UPDATE dissheet3 SET name = 'Minnie' WHERE id = 2;"),
-                new RunnableOperation(c1, 'c', "COMMIT;"),
-                new RunnableOperation(c2, 'r', "SELECT name FROM dissheet3 WHERE id = 2 FOR SHARE;"),
-                new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Donald' WHERE id = 1;"),
-                new RunnableOperation(c2, 'w', "UPDATE dissheet3 SET name = 'Daisy' WHERE id = 2;"),
-                new RunnableOperation(c2, 'c', "COMMIT;")));
-
-        executor_t1 = Executors.newFixedThreadPool(1);
-        executor_t2 = Executors.newFixedThreadPool(1);
-
-        for (RunnableOperation op : operations) {
-            if (op.c == c1)
-                executor_t1.execute(op);
-            if (op.c == c2)
-                executor_t2.execute(op);
-            Thread.sleep(250);
-        }
-
         executor_t1.shutdown();
         executor_t2.shutdown();
 
