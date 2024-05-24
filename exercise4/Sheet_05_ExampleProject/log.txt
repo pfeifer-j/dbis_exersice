@@ -1,0 +1,56 @@
+1,2,24,O.K. Quack
+2,1,5,Magica De Spell
+3,1,13,Scrooge McDuck
+4,2,21,Flintheart Glomgold
+5,2,21,Pandy Pap
+6,1,1,Granny Beagle
+7,2,39,Humphrey Gokart
+8,2,26,Sylvester Shyster
+9,2,20,The Phantom Blot
+10,1,5,Huey, Dewey, and Louie
+11,2,26,Huey, Dewey, and Louie
+12,2,21,Sylvester Shyster
+13,1,EOT
+14,2,EOT
+15,4,5,Magica De Spell
+16,3,34,Bum Bum Ghigno
+17,3,38,Howard Rockerduck
+18,4,13,Scrooge McDuck
+19,3,36,Huey, Dewey, and Louie
+20,4,1,Granny Beagle
+21,3,34,Belle Duck
+22,3,21,April, May, and June
+23,4,5,Huey, Dewey, and Louie
+24,3,29,Akers McCovet
+25,4,EOT
+26,3,21,Daisy Duck
+27,3,33,Eli Squinch
+28,3,EOT
+29,5,39,Eli Squinch
+30,6,5,Magica De Spell
+31,6,13,Scrooge McDuck
+32,5,30,Uncle Mortimer
+33,6,1,Granny Beagle
+34,5,29,Trudy Van Tubb
+35,5,23,Horace Horsecollar
+36,5,24,April, May, and June
+37,6,5,Huey, Dewey, and Louie
+38,5,38,Azure Blue
+39,6,EOT
+40,5,33,Mata Harrier
+41,5,30,Howard Rockerduck
+42,5,EOT
+43,7,5,Magica De Spell
+44,8,29,Reginella
+45,8,32,Scuttle
+46,7,13,Scrooge McDuck
+47,8,31,Eli Squinch
+48,7,1,Granny Beagle
+49,8,20,Ludwig Von Drake
+50,7,5,Huey, Dewey, and Louie
+51,8,20,Morty and Ferdie Fieldmouse
+52,8,38,Evronians
+53,7,EOT
+54,8,23,The Phantom Blot
+55,8,28,Minnie's other nieces
+56,8,EOT
