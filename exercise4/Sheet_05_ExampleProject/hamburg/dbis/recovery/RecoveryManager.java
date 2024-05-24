@@ -1,8 +1,11 @@
 package hamburg.dbis.recovery;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,13 +73,35 @@ public class RecoveryManager {
                     if (parts.length > 3 && !parts[3].equals("EOT")) { // Check if parts has at least 4 elements
                         int pageid = Integer.parseInt(parts[2]);
                         String data = parts[3];
-                        _persistenceManager.redoWriteOperation(transactionId, pageid, data);
-                        _persistenceManager.updateLSNInUserData(pageid, lsn, data);
+                        redoWriteOperation(transactionId, pageid, data);
+                        updateLSNInUserData(pageid, lsn, data);
                     }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }    
+    }
+
+    private void redoWriteOperation(int taid, int pageid, String data) {
+        String filename = _persistenceManager.USER_DATA_DIR + "Page_" + pageid + ".txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write(data);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to redo write operation", e);
+        }
+    }
+
+    private void updateLSNInUserData(int pageid, int lsn, String data) {
+        String filename = _persistenceManager.USER_DATA_DIR + "Page_" + pageid + ".txt";
+        try (RandomAccessFile raf = new RandomAccessFile(filename, "rw")) {
+            long length = raf.length();
+            if (length > 0) {
+                raf.seek(length - data.length() - 1); // Go to the beginning of LSN
+                raf.writeBytes(String.valueOf(lsn)); // Update LSN
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to update LSN in user data", e);
+        }
+    }
 }

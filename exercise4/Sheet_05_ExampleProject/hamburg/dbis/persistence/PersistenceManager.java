@@ -21,7 +21,7 @@ public class PersistenceManager {
 
     // TODO Add class variables if necessary
     public static final String LOG_FILE = "exercise4\\Sheet_05_ExampleProject\\log.txt";
-    private static final String USER_DATA_DIR = "exercise4\\Sheet_05_ExampleProject\\user_data\\";
+    public static final String USER_DATA_DIR = "exercise4\\Sheet_05_ExampleProject\\user_data\\";
 
     private final AtomicInteger transactionCounter = new AtomicInteger(0);
     private final AtomicInteger logSequenceCounter = new AtomicInteger(0);
@@ -40,7 +40,6 @@ public class PersistenceManager {
 
     private PersistenceManager() {
         // TODO Get the last used transaction id from the log (if present) at startup
-        // TODO Initialize class variables if necessary
         try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -53,6 +52,9 @@ public class PersistenceManager {
         } catch (IOException e) {
             // Log file might not exist at the start
         }
+
+        // TODO Initialize class variables if necessary
+
     }
 
     static public PersistenceManager getInstance() {
@@ -140,28 +142,6 @@ public class PersistenceManager {
                 buffer.remove(taid);
                 transactionPages.remove(taid);
             }
-        }
-    }
-
-        public void redoWriteOperation(int taid, int pageid, String data) {
-        String filename = USER_DATA_DIR + "Page_" + pageid + ".txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            writer.write(data);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to redo write operation", e);
-        }
-    }
-
-    public void updateLSNInUserData(int pageid, int lsn, String data) {
-        String filename = USER_DATA_DIR + "Page_" + pageid + ".txt";
-        try (RandomAccessFile raf = new RandomAccessFile(filename, "rw")) {
-            long length = raf.length();
-            if (length > 0) {
-                raf.seek(length - data.length() - 1); // Go to the beginning of LSN
-                raf.writeBytes(String.valueOf(lsn)); // Update LSN
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to update LSN in user data", e);
         }
     }
 }

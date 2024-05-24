@@ -68,3 +68,17 @@
 68,10,EOT
 69,9,24,Arpin Lusène
 70,9,EOT
+71,12,38,The Mad Doctor
+72,11,5,Magica De Spell
+73,12,35,Magica De Spell
+74,11,13,Scrooge McDuck
+75,12,36,Minnie Mouse
+76,12,24,Gilbert Goof
+77,11,1,Granny Beagle
+78,12,23,Marshal Mouse and Matilda Mouse
+79,11,5,Huey, Dewey, and Louie
+80,12,38,The Phantom Blot
+81,11,EOT
+82,12,22,Clara Cluck
+83,12,25,Charlie Doublejoke
+84,12,EOT
