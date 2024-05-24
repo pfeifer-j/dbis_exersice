@@ -35,30 +35,26 @@ public class Client extends Thread {
         _showDebug = !_showDebug;
     }
 
-
     @Override
     public void run() {
-
         if (_showDebug)
-            System.out.println("[Debug - Client " + _clientID + "]    Attempting to begin Transaction");
+            System.out.println("[Debug - Client " + _clientID + "] Attempting to begin Transaction");
         int taid = _pm.beginTransaction();
 
         for (Operation op : _schedule) {
-
             if (_showDebug)
-                System.out.println("[Debug - Client " + _clientID + "]    Attempting " + op.toString());
+                System.out.println("[Debug - Client " + _clientID + "] Attempting " + op.toString());
             _pm.write(taid, op.getPage(), op.getData());
 
             try {
-                Thread.sleep(_rnd.nextLong(_minSleepTimer, _maxSleepTimer + 1));
+                Thread.sleep(_rnd.nextInt(_maxSleepTimer - _minSleepTimer) + _minSleepTimer);
             } catch (InterruptedException e) {
                 return;
             }
         }
 
         if (_showDebug)
-            System.out.println("[Debug - Client " + _clientID + "]    Attempting Commit");
+            System.out.println("[Debug - Client " + _clientID + "] Attempting Commit");
         _pm.commit(taid);
     }
-
 }

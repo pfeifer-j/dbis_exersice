@@ -23,7 +23,6 @@ public class ClientManager {
     static public ClientManager getInstance() {
         return _manager;
     }
-
     public void startClients() {
 
         // TODO modify the amount of clients and their schedule to your liking
