@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ public class PersistenceManager {
     static final private PersistenceManager _manager;
 
     // TODO Add class variables if necessary
-    private static final String LOG_FILE = "exercise4\\Sheet_05_ExampleProject\\log.txt";
+    public static final String LOG_FILE = "exercise4\\Sheet_05_ExampleProject\\log.txt";
     private static final String USER_DATA_DIR = "exercise4\\Sheet_05_ExampleProject\\user_data\\";
 
     private final AtomicInteger transactionCounter = new AtomicInteger(0);
@@ -139,6 +140,28 @@ public class PersistenceManager {
                 buffer.remove(taid);
                 transactionPages.remove(taid);
             }
+        }
+    }
+
+        public void redoWriteOperation(int taid, int pageid, String data) {
+        String filename = USER_DATA_DIR + "Page_" + pageid + ".txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write(data);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to redo write operation", e);
+        }
+    }
+
+    public void updateLSNInUserData(int pageid, int lsn, String data) {
+        String filename = USER_DATA_DIR + "Page_" + pageid + ".txt";
+        try (RandomAccessFile raf = new RandomAccessFile(filename, "rw")) {
+            long length = raf.length();
+            if (length > 0) {
+                raf.seek(length - data.length() - 1); // Go to the beginning of LSN
+                raf.writeBytes(String.valueOf(lsn)); // Update LSN
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to update LSN in user data", e);
         }
     }
 }
