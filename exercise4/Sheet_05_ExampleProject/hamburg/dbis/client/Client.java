@@ -12,10 +12,10 @@ public class Client extends Thread {
 
     private final Schedule _schedule;
 
-    private Random _rnd;
+    private final Random _rnd;
 
     private boolean _showDebug = false;
-    private PersistenceManager _pm;
+    private final PersistenceManager _pm;
 
     public Client(int clientID, Schedule schedule) {
         this(clientID, schedule, 1000, 2500);

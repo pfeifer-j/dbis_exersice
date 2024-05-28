@@ -6,7 +6,7 @@ import java.util.Random;
 public class RandomHashSet<T> extends HashSet<T> {
 
     public T getRandomElement() {
-        if (this.size() <= 0) {
+        if (this.size() == 0) {
             return null;
         }
 
