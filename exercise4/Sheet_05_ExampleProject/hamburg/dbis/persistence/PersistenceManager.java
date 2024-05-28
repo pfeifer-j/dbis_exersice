@@ -20,8 +20,8 @@ public class PersistenceManager {
     static final private PersistenceManager _manager;
 
     // TODO Add class variables if necessary
-    public static final String LOG_FILE = "exercise4\\Sheet_05_ExampleProject\\log.txt";
-    public static final String USER_DATA_DIR = "exercise4\\Sheet_05_ExampleProject\\user_data\\";
+    public static final String LOG_FILE = "dbis\\exercise4\\Sheet_05_ExampleProject\\log.txt";
+    public static final String USER_DATA_DIR = "dbis\\exercise4\\Sheet_05_ExampleProject\\user_data\\";
 
     private final AtomicInteger transactionCounter = new AtomicInteger(0);
     private final AtomicInteger logSequenceCounter = new AtomicInteger(0);
@@ -43,7 +43,7 @@ public class PersistenceManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
+                String[] parts = line.split(";");
                 int lsn = Integer.parseInt(parts[0]);
                 int taid = Integer.parseInt(parts[1]);
                 logSequenceCounter.set(Math.max(logSequenceCounter.get(), lsn));
@@ -113,7 +113,7 @@ public class PersistenceManager {
 
     private synchronized void writeLogEntry(int taid, int pageid, String data) {
         int lsn = logSequenceCounter.incrementAndGet();
-        String logEntry = pageid == 0 ? lsn + "," + taid + "," + data : lsn + "," + taid + "," + pageid + "," + data;
+        String logEntry = pageid == 0 ? lsn + ";" + taid + ";" + data : lsn + ";" + taid + ";" + pageid + ";" + data;
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOG_FILE, true))) {
             writer.write(logEntry);
             writer.newLine();
@@ -126,7 +126,7 @@ public class PersistenceManager {
         String filename = USER_DATA_DIR + "Page_" + pageid + ".txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             int lsn = logSequenceCounter.get();
-            writer.write(lsn + "," + data);
+            writer.write(lsn + ";" + data);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write user data", e);
         }

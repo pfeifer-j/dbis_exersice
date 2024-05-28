@@ -11,7 +11,7 @@ public class DataLoader {
     public static RandomHashSet<String> loadExampleData() {
         RandomHashSet<String> data = new RandomHashSet<String>();
 
-        String filename = "exercise4\\Sheet_05_ExampleProject\\example_data.txt";
+        String filename = "dbis\\exercise4\\Sheet_05_ExampleProject\\example_data.txt";
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
