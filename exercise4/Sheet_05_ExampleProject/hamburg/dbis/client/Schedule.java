@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 public class Schedule implements Iterable<Operation> {
 
-    private ArrayList<Operation> _schedule;
+    private final ArrayList<Operation> _schedule;
 
     @Override
     public Iterator iterator() {
@@ -13,7 +13,7 @@ public class Schedule implements Iterable<Operation> {
     }
 
     private Schedule() {
-        _schedule = new ArrayList<Operation>();
+        _schedule = new ArrayList<>();
     }
 
     public static Schedule createSchedule() {

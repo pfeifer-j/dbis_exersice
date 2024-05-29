@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,8 +15,8 @@ public class RecoveryManager {
     static final private RecoveryManager _manager;
 
     // TODO Add class variables if necessary
-    private PersistenceManager _persistenceManager;
-    private Map<Integer, Integer> transactionLSNs;
+    private final PersistenceManager _persistenceManager;
+    private final Map<Integer, Integer> transactionLSNs;
 
 
     static {
@@ -76,7 +75,7 @@ public class RecoveryManager {
 
 
 
-                        String filename = _persistenceManager.USER_DATA_DIR + "Page_" + pageid + ".txt";
+                        String filename = PersistenceManager.USER_DATA_DIR + "Page_" + pageid + ".txt";
                         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
                             writer.write(lsn + ";" + data);
                         } catch (IOException e) {

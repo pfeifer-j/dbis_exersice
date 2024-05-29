@@ -16,12 +16,12 @@ public class Main {
         if (getConsoleInput("[1]    Start the recovery?"))
             RecoveryManager.getInstance().startRecovery();
 
-        System.out.println("");
+        System.out.println();
 
         if (getConsoleInput("[2]    Start the clients?"))
             ClientManager.getInstance().startClients();
 
-        System.out.println("");
+        System.out.println();
     }
 
     static private boolean getConsoleInput(String label) {
