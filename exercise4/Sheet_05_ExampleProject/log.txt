@@ -1,0 +1,25 @@
+1;2;5;Magica De Spell
+2;1;21;Goofy
+3;1;21;Oswald the Lucky Rabbit
+4;2;13;Scrooge McDuck
+5;1;26;Millie and Melody Mouse
+6;2;1;Granny Beagle
+7;1;28;Baron Thieving
+8;2;5;Huey, Dewey, and Louie
+11;2;EOT
+9;1;35;Morty and Ferdie Fieldmouse
+10;1;35;Miss Quackfaster
+12;1;21;Bum Bum Ghigno13;3;37;Rockhead Rooster
+14;4;5;Magica De Spell
+15;3;30;Mortimer Mouse
+16;4;13;Scrooge McDuck
+17;3;26;April, May, and June
+18;3;33;Humphrey Gokart
+19;4;1;Granny Beagle
+20;3;26;Pandy Pap
+21;3;37;Uncle Mortimer
+22;3;39;Reginella
+23;4;5;Huey, Dewey, and Louie
+24;3;34;Granny De Spell
+25;3;EOT
+26;4;EOT

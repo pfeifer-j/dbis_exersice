@@ -15,6 +15,8 @@ public class PersistenceManager {
 
     private final AtomicInteger transactionCounter = new AtomicInteger(0);
     private final AtomicInteger logSequenceCounter = new AtomicInteger(0);
+
+    // (Transaktion-ID, (Page-ID, LogData(LSN, Data)))
     private final Map<Integer, Map<Integer, LogData>> buffer = new ConcurrentHashMap<>();
     private final Map<Integer, List<Integer>> transactionPages = new ConcurrentHashMap<>();
     private final Set<Integer> committedTransactions = Collections.synchronizedSet(new HashSet<>());
@@ -44,7 +46,6 @@ public class PersistenceManager {
         }
 
         // TODO Initialize class variables if necessary
-
     }
 
     static public PersistenceManager getInstance() {

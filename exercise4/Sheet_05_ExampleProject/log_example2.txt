@@ -1,0 +1,13 @@
+1;2;5;Magica De Spell
+2;1;21;Goofy
+3;1;21;Oswald the Lucky Rabbit
+4;2;13;Scrooge McDuck
+5;1;26;Millie and Melody Mouse
+6;2;1;Granny Beagle
+7;1;28;Baron Thieving
+8;2;5;Huey, Dewey, and Louie
+9;1;35;Morty and Ferdie Fieldmouse
+10;1;35;Miss Quackfaster
+11;2;EOT
+12;1;21;Bum Bum Ghigno
+13;1;EOT
