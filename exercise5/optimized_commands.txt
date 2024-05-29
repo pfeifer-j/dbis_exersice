@@ -1,0 +1,302 @@
+# MongoDB Example Commands
+
+## Running MongoDB
+docker run -it --network mongo_default --rm mongo mongosh --host mongo -u root -p password
+
+use imdb
+
+## Insert
+
+show dbs
+show collections
+
+db.films.insertOne({
+  title: "Star Trek Into Darkness",
+  year: 2013,
+  genre: ["Action", "Adventure", "Sci-Fi"],
+  actors: ["Pine, Chris", "Quinto, Zachary", "Saldana, Zoe"],
+  releases: [
+    {
+      country: "USA",
+      date: ISODate("2013-05-17"),
+      prerelease: true
+    },
+    {
+      country: "Germany",
+      date: ISODate("2013-05-16"),
+      prerelease: false
+    }
+  ]
+})
+
+db.films.insertOne({
+  title: "Iron Man 3",
+  year: 2013,
+  genre: ["Action", "Adventure", "Sci-Fi"],
+  actors: ["Downey Jr., Robert", "Paltrow, Gwyneth"]
+  // no releases
+})
+
+db.films.insertOne({
+  title: "This Means War",
+  year: 2011,
+  genre: ["Action", "Comedy", "Romance"],
+  actors: ["Pine, Chris", "Witherspoon, Reese", "Hardy, Tom"],
+  releases: [
+    {
+      country: "USA",
+      date: ISODate("2011-02-17"),
+      prerelease: false
+    },
+    {
+      country: "UK",
+      date: ISODate("2011-03-01"),
+      prerelease: true
+    }
+  ]
+})
+
+db.films.insertOne({
+  title: "The Amazing Spider-Man 2",
+  year: 2014,
+  genre: ["Action", "Adventure", "Fantasy"],
+  actors: ["Stone, Emma", "Woodley, Shailene"]
+  // no releases
+})
+
+## Querying
+
+db.films.find({title: "Iron Man 3"})
+db.films.findOne({title: "Iron Man 3"})
+db.films.find({title: /^T/})
+db.films.find({title: /^T/}, {title: 1})
+db.films.find({title: /^T/}, {_id: 0, title: 1})
+
+db.films.find({
+  year: {
+    $gt: 2009,
+    $lte: 2011
+  },
+  title: /^T/
+},
+{ _id: 0, title: 1 })
+
+db.films.find({
+  $or: [
+    {
+      year: {
+        $gt: 2009,
+        $lte: 2011
+      }
+    },
+    {title: /^T/}
+  ]
+},
+{ _id: 0, title: 1 })
+
+db.movies.ensureIndex({rating: 1})
+
+db.films.find({title: /t/}, {_id: 0, title: 1})
+db.films.find({title: /t/i}, {_id: 0, title: 1})
+db.films.find({genre: "Adventure"}, {_id: 0, title: 1, genre: 1})
+db.films.find({genre: /^A/}, {_id: 0, title: 1, genre: 1})
+db.films.find({actors: {$all: [/pine/i, /zachary/i]}}, {_id: 0, title: 1, actors: 1})
+db.films.find({actors: {$nin: [/pine/i, /zachary/i]}}, {_id: 0, title: 1, actors: 1})
+db.films.find({releases: {$exists: false}}, {_id: 0, title: 1})
+db.films.find({'releases.country': "UK"}, {_id: 0, title: 1, releases: 1})
+db.films.find({'releases.country': "USA", 'releases.prerelease': true}, {_id: 0, title: 1, releases: 1})
+
+db.films.find({
+  releases: {
+    $elemMatch: {
+      country: "USA",
+      prerelease: true
+    }
+  }
+},
+{_id: 0, title: 1, releases: 1})
+
+## Update
+
+### Docker Command
+
+#### Bash:
+docker exec -i mongo_db sh -c 'mongoimport -u root -p password -c movies -d imdb --authenticationDatabase=admin --drop' < ./src/data/movies.json
+
+#### PowerShell:
+cmd.exe /c "docker exec -i mongo_db sh -c " mongoimport -u root -p password -c movies -d imdb --authenticationDatabase=admin --drop " < exercise5\src\data\movies.json"
+
+### MongoDB Commands
+
+db.films.updateOne(
+  {title: "Star Trek Into Darkness"},
+  {$set: {rating: 6.4}}
+)
+
+db.films.updateOne(
+  {title: "Star Trek Into Darkness"},
+  {$inc: {rating: 0.1}}
+)
+
+## Delete
+
+db.films.find({title: /^T/})
+db.films.removeOne({title: /^T/})
+
+## Delete the whole database
+# use imdb
+# db.films.drop()
+# db.movies.drop()
+# db.dropDatabase()
+
+
+## Speed Up Queries By Indexing
+
+db.movies.find({
+  rating: {
+    $gt: 6.14,
+    $lt: 7.78
+  }
+}).explain("executionStats")
+
+#### Output:
+{
+  queryPlanner: {
+    plannerVersion: 1,
+    namespace: 'imdb.movies',
+    indexFilterSet: false,
+    parsedQuery: {
+      '$and': [ { rating: { '$lt': 7.78 } }, { rating: { '$gt': 6.14 } } ]
+    },
+    winningPlan: {
+      stage: 'COLLSCAN',
+      filter: {
+        '$and': [ { rating: { '$lt': 7.78 } }, { rating: { '$gt': 6.14 } } ]
+      },
+      direction: 'forward'
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 94327,
+    executionTimeMillis: 262, # <- This is the important stat
+    totalKeysExamined: 0,
+    totalDocsExamined: 234252,
+    executionStages: {
+      stage: 'COLLSCAN',
+      filter: {
+        '$and': [ { rating: { '$lt': 7.78 } }, { rating: { '$gt': 6.14 } } ]
+      },
+      nReturned: 94327,
+      executionTimeMillisEstimate: 28, 
+      works: 234254,
+      advanced: 94327,
+      needTime: 139926,
+      needYield: 0,
+      saveState: 234,
+      restoreState: 234,
+      isEOF: 1,
+      direction: 'forward',
+      docsExamined: 234252
+    }
+  },
+  serverInfo: {
+    host: 'fb86a24e5bf5',
+    port: 27017,
+    version: '4.4.29',
+    gitVersion: 'f4dda329a99811c707eb06d05ad023599f9be263'
+  },
+  ok: 1
+}
+
+db.movies.ensureIndex({rating: 1})
+
+// Output
+// [ 'rating_1' ]
+{
+  queryPlanner: {
+    plannerVersion: 1,
+    namespace: 'imdb.movies',
+    indexFilterSet: false,
+    parsedQuery: {
+      '$and': [ { rating: { '$lt': 7.78 } }, { rating: { '$gt': 6.14 } } ]
+    },
+    winningPlan: {
+      stage: 'FETCH',
+      inputStage: {
+        stage: 'IXSCAN',
+        keyPattern: { rating: 1 },
+        indexName: 'rating_1',
+        isMultiKey: false,
+        multiKeyPaths: { rating: [] },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: { rating: [ '(6.14, 7.78)' ] }
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 94327,
+    executionTimeMillis: 156, # <- This is the new time
+    totalKeysExamined: 94327,
+    totalDocsExamined: 94327,
+    executionStages: {
+      stage: 'FETCH',
+      nReturned: 94327,
+      executionTimeMillisEstimate: 30,
+      works: 94328,
+      advanced: 94327,
+      needTime: 0,
+      needYield: 0,
+      saveState: 94,
+      restoreState: 94,
+      isEOF: 1,
+      docsExamined: 94327,
+      alreadyHasObj: 0,
+      inputStage: {
+        stage: 'IXSCAN',
+        nReturned: 94327,
+        executionTimeMillisEstimate: 17,
+        works: 94328,
+        advanced: 94327,
+        needTime: 0,
+        needYield: 0,
+        saveState: 94,
+        restoreState: 94,
+        isEOF: 1,
+        keyPattern: { rating: 1 },
+        indexName: 'rating_1',
+        isMultiKey: false,
+        multiKeyPaths: { rating: [] },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: { rating: [ '(6.14, 7.78)' ] },
+        keysExamined: 94327,
+        seeks: 1,
+        dupsTested: 0,
+        dupsDropped: 0
+      }
+    }
+  },
+  serverInfo: {
+    host: 'fb86a24e5bf5',
+    port: 27017,
+    version: '4.4.29',
+    gitVersion: 'f4dda329a99811c707eb06d05ad023599f9be263'
+  },
+  ok: 1
+}
+
+# 1. try: 262
+# 2. try: 156
+
+
