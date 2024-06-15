@@ -30,13 +30,10 @@ public class Main {
 
         System.out.print("Enter the geographical dimension (country, region, city, shop): ");
         geo = scanner.nextLine().trim().toLowerCase();
-
         System.out.print("Enter the time dimension (date, day, month, quarter, year): ");
         time = scanner.nextLine().trim().toLowerCase();
-
         System.out.print("Enter the product dimension (article, productgroup, productfamily, productcategory): ");
         product = scanner.nextLine().trim().toLowerCase();
-
         scanner.close();
 
         System.out.println("\nPerforming analysis for geo: " + geo + ", time: " + time + ", product: " + product);

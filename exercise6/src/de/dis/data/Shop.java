@@ -12,7 +12,6 @@ public class Shop {
     }
     
     public Shop() {
-        //TODO Auto-generated constructor stub
     }
 
     public int getShopID() {
