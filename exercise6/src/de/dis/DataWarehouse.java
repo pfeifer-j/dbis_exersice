@@ -19,6 +19,86 @@ import de.dis.data.ProductCategory;
 public class DataWarehouse {
 
     private List<SalesFact> salesFacts;
+    public List<SalesFact> getSalesFacts() {
+        return salesFacts;
+    }
+
+    public void setSalesFacts(List<SalesFact> salesFacts) {
+        this.salesFacts = salesFacts;
+    }
+
+    public List<Sale> getSales() {
+        return sales;
+    }
+
+    public void setSales(List<Sale> sales) {
+        this.sales = sales;
+    }
+
+    public List<Country> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<Country> countries) {
+        this.countries = countries;
+    }
+
+    public List<Region> getRegions() {
+        return regions;
+    }
+
+    public void setRegions(List<Region> regions) {
+        this.regions = regions;
+    }
+
+    public List<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(List<City> cities) {
+        this.cities = cities;
+    }
+
+    public List<Shop> getShops() {
+        return shops;
+    }
+
+    public void setShops(List<Shop> shops) {
+        this.shops = shops;
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
+    }
+
+    public List<ProductGroup> getProductGroups() {
+        return productGroups;
+    }
+
+    public void setProductGroups(List<ProductGroup> productGroups) {
+        this.productGroups = productGroups;
+    }
+
+    public List<ProductFamily> getProductFamilies() {
+        return productFamilies;
+    }
+
+    public void setProductFamilies(List<ProductFamily> productFamilies) {
+        this.productFamilies = productFamilies;
+    }
+
+    public List<ProductCategory> getProductCategories() {
+        return productCategories;
+    }
+
+    public void setProductCategories(List<ProductCategory> productCategories) {
+        this.productCategories = productCategories;
+    }
+
     private List<Sale> sales;
     private List<Country> countries;
     private List<Region> regions;
@@ -129,7 +209,17 @@ public class DataWarehouse {
         }
     }
 
-    private Country getCountryByID(int countryID) {
+    public Shop getShopByID(int shopID) {
+        for (Shop shop : shops) {
+            if (shop.getShopID() == shopID) {
+                return shop;
+            }
+        }
+        return null;
+    }
+
+
+    public Country getCountryByID(int countryID) {
         for (Country country : countries) {
             if (country.getCountryID() == countryID) {
                 return country;
@@ -138,7 +228,7 @@ public class DataWarehouse {
         return null;
     }
 
-    private Region getRegionByID(int regionID) {
+    public Region getRegionByID(int regionID) {
         for (Region region : regions) {
             if (region.getRegionID() == regionID) {
                 return region;
@@ -147,7 +237,7 @@ public class DataWarehouse {
         return null;
     }
 
-    private City getCityByID(int cityID) {
+    public City getCityByID(int cityID) {
         for (City city : cities) {
             if (city.getCityID() == cityID) {
                 return city;
@@ -156,7 +246,16 @@ public class DataWarehouse {
         return null;
     }
 
-    private ProductGroup getProductGroupByID(int productGroupID) {
+    public Article getArticleByID(int articleID) {
+        for (Article article : articles) {
+            if (article.getArticleID() == articleID) {
+                return article;
+            }
+        }
+        return null;
+    }
+
+    public ProductGroup getProductGroupByID(int productGroupID) {
         for (ProductGroup productGroup : productGroups) {
             if (productGroup.getProductGroupID() == productGroupID) {
                 return productGroup;
@@ -165,7 +264,7 @@ public class DataWarehouse {
         return null;
     }
 
-    private ProductFamily getProductFamilyByID(int productFamilyID) {
+    public ProductFamily getProductFamilyByID(int productFamilyID) {
         for (ProductFamily productFamily : productFamilies) {
             if (productFamily.getProductFamilyID() == productFamilyID) {
                 return productFamily;
@@ -174,7 +273,7 @@ public class DataWarehouse {
         return null;
     }
 
-    private ProductCategory getProductCategoryByID(int productCategoryID) {
+    public ProductCategory getProductCategoryByID(int productCategoryID) {
         for (ProductCategory productCategory : productCategories) {
             if (productCategory.getProductCategoryID() == productCategoryID) {
                 return productCategory;

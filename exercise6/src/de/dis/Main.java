@@ -1,19 +1,25 @@
 package de.dis;
 
-
 public class Main {
 
     public static void main(String[] args) {
-        DataWarehouse manager = new DataWarehouse();
+        DataWarehouse dataWarehouse = new DataWarehouse();
 
         // Exctract
-        manager.loadSalesDataFromCSV();
-        manager.loadDimensionDataFromDatabase();
+        dataWarehouse.loadSalesDataFromCSV();
+        dataWarehouse.loadDimensionDataFromDatabase();
 
         // Transform
-        manager.transformToSalesFacts();
+        dataWarehouse.transformToSalesFacts();
 
         // Load
-        manager.aggregateSalesByDimensions();
+        DataAnalysisApp dataAnalysisApp = new DataAnalysisApp(dataWarehouse);
+
+        String geo = "country";    // Example: "country", "region", "city", "shop"
+        String time = "month";     // Example: "date", "day", "month", "quarter", "year"
+        String product = "productcategory"; // Example: "article", "productgroup", "productfamily", "productcategory"
+        
+        System.out.println("Performing analysis for geo: " + geo + ", time: " + time + ", product: " + product);
+        dataAnalysisApp.analysis(geo, time, product);
     }
 }

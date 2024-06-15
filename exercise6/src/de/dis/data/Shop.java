@@ -11,6 +11,10 @@ public class Shop {
         this.name = name;
     }
     
+    public Shop() {
+        //TODO Auto-generated constructor stub
+    }
+
     public int getShopID() {
         return shopID;
     }

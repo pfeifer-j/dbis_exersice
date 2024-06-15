@@ -13,6 +13,10 @@ public class Article {
         this.price = price;
     }
     
+    public Article() {
+        //TODO Auto-generated constructor stub
+    }
+
     public int getArticleID() {
         return articleID;
     }
