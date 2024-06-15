@@ -73,10 +73,4 @@ public class SaleLoader {
             return null;
         }
     }
-   
-    public static void main(String[] args) {
-        SaleLoader loader = new SaleLoader();
-        List<Sale> sales = loader.loadSalesFromCSV();
-        System.out.println(sales.toString());
-    }
 }

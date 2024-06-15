@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
 import de.dis.data.Country;
 import de.dis.data.Region;
@@ -182,19 +181,5 @@ public class DataWarehouse {
             }
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        DataWarehouse manager = new DataWarehouse();
-
-        // Exctract
-        manager.loadSalesDataFromCSV();
-        manager.loadDimensionDataFromDatabase();
-
-        // Transform
-        manager.transformToSalesFacts();
-
-        // Load
-        manager.aggregateSalesByDimensions();
     }
 }

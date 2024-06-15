@@ -2,19 +2,6 @@ package de.dis.data;
 
 import java.sql.Date;
 
-/*
-    CREATE TABLE sales (
-    SalesID int NOT NULL, 
-    Date DATE,
-    ShopID INT,
-    ArticleID INT,
-    Sold INT,
-    Revenue DECIMAL(10, 2),
-    PRIMARY KEY (SalesID),
-    FOREIGN KEY (shopID) REFERENCES Shop(ShopID),
-    FOREIGN KEY (articleID) REFERENCES Article(ArticleID));
- */
-
 public class Sale {
     private int salesID;
     private Date date;
@@ -23,7 +10,6 @@ public class Sale {
     private int sold;
     private double revenue;
 
-    // Constructor
     public Sale(Date date, String shop, String article, int sold, double revenue) {
         this.date = date;
         this.shop = shop;
@@ -41,7 +27,6 @@ public class Sale {
         this.revenue = revenue;
     }
 
-    // Getters (and optionally setters)
     public Date getDate() {
         return date;
     }

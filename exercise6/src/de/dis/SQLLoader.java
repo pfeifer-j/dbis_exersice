@@ -198,10 +198,4 @@ public class SQLLoader {
 
         return productCategories;
     }
-
-    public static void main(String[] args) {
-        DbConnectionManager mgr = new DbConnectionManager();
-        SQLLoader loader = new SQLLoader(mgr);
-        System.out.println(loader.getArticles());;
-    }
 }
