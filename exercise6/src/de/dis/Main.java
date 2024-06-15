@@ -3,7 +3,6 @@ package de.dis;
 import java.util.List;
 
 import de.dis.data.Country;
-import de.dis.data.DbConnectionManager;
 import de.dis.data.Region;
 import de.dis.data.Sale;
 import de.dis.data.City;
@@ -20,8 +19,7 @@ public class Main {
 
         // Load CSV
         SaleLoader csvLoader = new SaleLoader();
-        List<Sale> sales = csvLoader.loadSalesFromCSV("ressources\\sales.csv");
-        // System.out.println(sales.toString());
+        List<Sale> sales = csvLoader.loadSalesFromCSV();
 
         // Load DB
         DbConnectionManager dbManager = DbConnectionManager.getInstance();
@@ -36,8 +34,8 @@ public class Main {
         List<ProductFamily> productFamilies = sqlLoader.getProductFamilies();
         List<ProductCategory> productCategories = sqlLoader.getProductCategories();
 
-        System.out.println(countries.toString());
-
-
+        System.err.println(productGroups.toString());
+        System.err.println(productFamilies.toString());
+        System.err.println(productCategories.toString());
     }
 }

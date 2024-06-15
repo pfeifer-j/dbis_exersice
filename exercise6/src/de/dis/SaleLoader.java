@@ -13,10 +13,12 @@ import de.dis.data.Sale;
 
 public class SaleLoader {
 
-    public List<Sale> loadSalesFromCSV(String filename) {
+    final String PATH = "ressources\\sales.csv";
+
+    public List<Sale> loadSalesFromCSV() {
         List<Sale> sales = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(PATH))) {
             String line;
             boolean headerSkipped = false;
             while ((line = br.readLine()) != null) {
@@ -74,7 +76,7 @@ public class SaleLoader {
    
     public static void main(String[] args) {
         SaleLoader loader = new SaleLoader();
-        List<Sale> sales = loader.loadSalesFromCSV("ressources\\sales.csv");
+        List<Sale> sales = loader.loadSalesFromCSV();
         System.out.println(sales.toString());
     }
 }

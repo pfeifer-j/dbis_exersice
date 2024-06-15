@@ -10,7 +10,6 @@ import java.util.List;
 import de.dis.data.Article;
 import de.dis.data.City;
 import de.dis.data.Country;
-import de.dis.data.DbConnectionManager;
 import de.dis.data.ProductCategory;
 import de.dis.data.ProductFamily;
 import de.dis.data.ProductGroup;

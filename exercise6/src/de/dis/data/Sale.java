@@ -16,7 +16,7 @@ import java.sql.Date;
  */
 
 public class Sale {
-    private int salesId;
+    private int salesID;
     private Date date;
     private String shop;
     private String article;
@@ -32,8 +32,8 @@ public class Sale {
         this.revenue = revenue;
     }
 
-    public Sale(int salesId, Date date, String shop, String article, int sold, double revenue) {
-        this.salesId = salesId;
+    public Sale(int salesID, Date date, String shop, String article, int sold, double revenue) {
+        this.salesID = salesID;
         this.date = date;
         this.shop = shop;
         this.article = article;
@@ -63,15 +63,11 @@ public class Sale {
     }
 
     public int getSalesID() {
-        return salesId;
+        return salesID;
     }
 
-    public int getSalesId() {
-        return salesId;
-    }
-
-    public void setSalesId(int salesId) {
-        this.salesId = salesId;
+    public void setSalesID(int salesID) {
+        this.salesID = salesID;
     }
 
     public void setDate(Date date) {
