@@ -1,4 +1,4 @@
-package de.dis.data;
+package de.dis;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,6 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.dis.data.Article;
+import de.dis.data.City;
+import de.dis.data.Country;
+import de.dis.data.DbConnectionManager;
+import de.dis.data.ProductCategory;
+import de.dis.data.ProductFamily;
+import de.dis.data.ProductGroup;
+import de.dis.data.Region;
+import de.dis.data.Shop;
 
 public class SQLLoader {
 
@@ -188,5 +198,11 @@ public class SQLLoader {
         }
 
         return productCategories;
+    }
+
+    public static void main(String[] args) {
+        DbConnectionManager mgr = new DbConnectionManager();
+        SQLLoader loader = new SQLLoader(mgr);
+        System.out.println(loader.getArticles());;
     }
 }

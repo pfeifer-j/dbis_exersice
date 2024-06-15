@@ -94,5 +94,7 @@ public class Sale {
         this.revenue = revenue;
     }
 
-    
+    public String toString(){
+        return date + ", " + shop + ", " + article + ", " + sold + ", " + revenue + "\n";
+    }   
 }

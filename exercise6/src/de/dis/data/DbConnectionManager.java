@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 /**
@@ -23,7 +24,7 @@ public class DbConnectionManager {
 	/**
 	 * Erzeugt eine Datenbank-Verbindung
 	 */
-	private DbConnectionManager() {
+	public DbConnectionManager() {
 		try {
 			// Holen der Einstellungen aus der db.properties Datei
 			Properties properties = new Properties();
@@ -60,7 +61,29 @@ public class DbConnectionManager {
 	 * @return Connection
 	 */
 	public Connection getConnection() {
-		return _con;
+		try {
+            if (_con == null || _con.isClosed()) {
+				try {
+					// Holen der Einstellungen aus der db.properties Datei
+					Properties properties = new Properties();
+					FileInputStream stream = new FileInputStream(new File("db.properties"));
+					properties.load(stream);
+					stream.close();
+		
+					String jdbcUser = properties.getProperty("jdbc_user");
+					String jdbcPass = properties.getProperty("jdbc_pass");
+					String jdbcUrl = properties.getProperty("jdbc_url");
+					// Verbindung zur Datenbank herstellen
+					_con = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass);
+		
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return _con;
 	}
 
 }
