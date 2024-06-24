@@ -11,12 +11,13 @@ public class SalesFact {
     private int productGroupID;
     private int productFamilyID;
     private int productCategoryID;
+    private int sold;
     private Date saleDate;
     private double turnover;
 
     public SalesFact(int countryID, int regionID, int cityID, int shopID, int articleID,
                      int productGroupID, int productFamilyID, int productCategoryID,
-                     Date saleDate, double turnover) {
+                     Date saleDate, double turnover, int sold) {
         this.countryID = countryID;
         this.regionID = regionID;
         this.cityID = cityID;
@@ -27,6 +28,7 @@ public class SalesFact {
         this.productCategoryID = productCategoryID;
         this.saleDate = saleDate;
         this.turnover = turnover;
+        this.sold = sold;
     }
 
     public SalesFact() {
@@ -110,6 +112,10 @@ public class SalesFact {
 
     public void setTurnover(double turnover) {
         this.turnover = turnover;
+    }
+
+    public int getSold() {
+        return this.sold;
     }
 
     @Override
