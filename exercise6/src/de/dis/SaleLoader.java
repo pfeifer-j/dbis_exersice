@@ -1,10 +1,13 @@
 package de.dis;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Date;
 import java.text.ParseException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +20,8 @@ public class SaleLoader {
 
     public List<Sale> loadSalesFromCSV() {
         List<Sale> sales = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(PATH))) {
+        
+         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(PATH), StandardCharsets.UTF_8))) {
             String line;
             boolean headerSkipped = false;
             while ((line = br.readLine()) != null) {

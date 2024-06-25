@@ -10,11 +10,11 @@ import de.dis.data.SalesFact;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DataAnalysisApp {
+public class DataAnalysisInCode {
 
     private DataWarehouse dataWarehouse;
 
-    public DataAnalysisApp(DataWarehouse dataWarehouse) {
+    public DataAnalysisInCode(DataWarehouse dataWarehouse) {
         this.dataWarehouse = dataWarehouse;
     }
 

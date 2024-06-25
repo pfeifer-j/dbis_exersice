@@ -1,5 +1,13 @@
 package de.dis;
 
+import java.beans.Statement;
+import java.sql.Connection;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +105,79 @@ public class DataWarehouse {
 
     public void setProductCategories(List<ProductCategory> productCategories) {
         this.productCategories = productCategories;
+    }
+
+    public Shop getShopByID(int shopID) {
+        for (Shop shop : shops) {
+            if (shop.getShopID() == shopID) {
+                return shop;
+            }
+        }
+        return null;
+    }
+
+
+    public Country getCountryByID(int countryID) {
+        for (Country country : countries) {
+            if (country.getCountryID() == countryID) {
+                return country;
+            }
+        }
+        return null;
+    }
+
+    public Region getRegionByID(int regionID) {
+        for (Region region : regions) {
+            if (region.getRegionID() == regionID) {
+                return region;
+            }
+        }
+        return null;
+    }
+
+    public City getCityByID(int cityID) {
+        for (City city : cities) {
+            if (city.getCityID() == cityID) {
+                return city;
+            }
+        }
+        return null;
+    }
+
+    public Article getArticleByID(int articleID) {
+        for (Article article : articles) {
+            if (article.getArticleID() == articleID) {
+                return article;
+            }
+        }
+        return null;
+    }
+
+    public ProductGroup getProductGroupByID(int productGroupID) {
+        for (ProductGroup productGroup : productGroups) {
+            if (productGroup.getProductGroupID() == productGroupID) {
+                return productGroup;
+            }
+        }
+        return null;
+    }
+
+    public ProductFamily getProductFamilyByID(int productFamilyID) {
+        for (ProductFamily productFamily : productFamilies) {
+            if (productFamily.getProductFamilyID() == productFamilyID) {
+                return productFamily;
+            }
+        }
+        return null;
+    }
+
+    public ProductCategory getProductCategoryByID(int productCategoryID) {
+        for (ProductCategory productCategory : productCategories) {
+            if (productCategory.getProductCategoryID() == productCategoryID) {
+                return productCategory;
+            }
+        }
+        return null;
     }
 
     private List<Sale> sales;
@@ -209,76 +290,71 @@ public class DataWarehouse {
         }
     }
 
-    public Shop getShopByID(int shopID) {
-        for (Shop shop : shops) {
-            if (shop.getShopID() == shopID) {
-                return shop;
-            }
+    public void createSalesFactTable() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS SalesFact (" +
+                "countryID INT," +
+                "regionID INT," +
+                "cityID INT," +
+                "shopID INT," +
+                "articleID INT," +
+                "productGroupID INT," +
+                "productFamilyID INT," +
+                "productCategoryID INT," +
+                "saleDate DATE," +
+                "revenue DOUBLE" +
+                ")";
+
+        try (Connection con = DbConnectionManager.getInstance().getConnection();
+             PreparedStatement pstmt = con.prepareStatement(createTableSQL)) {
+
+            pstmt.execute();
+            System.out.println("SalesFact table created or already exists.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null;
     }
 
+    // Method to store sales facts in the database
+    public void storeSalesFactsInDatabase() {
+        createSalesFactTable(); // Ensure table exists before inserting data
 
-    public Country getCountryByID(int countryID) {
-        for (Country country : countries) {
-            if (country.getCountryID() == countryID) {
-                return country;
-            }
-        }
-        return null;
-    }
+        String insertSQL = "INSERT INTO SalesFact (countryID, regionID, cityID, shopID, articleID, productGroupID, productFamilyID, productCategoryID, saleDate, revenue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public Region getRegionByID(int regionID) {
-        for (Region region : regions) {
-            if (region.getRegionID() == regionID) {
-                return region;
-            }
-        }
-        return null;
-    }
+        try (Connection con = DbConnectionManager.getInstance().getConnection();
+             PreparedStatement pstmt = con.prepareStatement(insertSQL)) {
 
-    public City getCityByID(int cityID) {
-        for (City city : cities) {
-            if (city.getCityID() == cityID) {
-                return city;
-            }
-        }
-        return null;
-    }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-    public Article getArticleByID(int articleID) {
-        for (Article article : articles) {
-            if (article.getArticleID() == articleID) {
-                return article;
-            }
-        }
-        return null;
-    }
 
-    public ProductGroup getProductGroupByID(int productGroupID) {
-        for (ProductGroup productGroup : productGroups) {
-            if (productGroup.getProductGroupID() == productGroupID) {
-                return productGroup;
-            }
-        }
-        return null;
-    }
+            for (SalesFact fact : salesFacts) {
+                pstmt.setInt(1, fact.getCountryID());
+                pstmt.setInt(2, fact.getRegionID());
+                pstmt.setInt(3, fact.getCityID());
+                pstmt.setInt(4, fact.getShopID());
+                pstmt.setInt(5, fact.getArticleID());
+                pstmt.setInt(6, fact.getProductGroupID());
+                pstmt.setInt(7, fact.getProductFamilyID());
+                pstmt.setInt(8, fact.getProductCategoryID());
+                
+                String input = "Thu Jun 18 20:56:02 EDT 2009";
+                SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy");
+                Date date = parser.parse(input);
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String formattedDate = formatter.format(date);
 
-    public ProductFamily getProductFamilyByID(int productFamilyID) {
-        for (ProductFamily productFamily : productFamilies) {
-            if (productFamily.getProductFamilyID() == productFamilyID) {
-                return productFamily;
-            }
-        }
-        return null;
-    }
+                Date parsedDate = dateFormat(fact.getSaleDate());
+                pstmt.setDate(9, new java.sql.Date(parsedDate.getTime()));
+                pstmt.setDouble(10, fact.getTurnover());
 
-    public ProductCategory getProductCategoryByID(int productCategoryID) {
-        for (ProductCategory productCategory : productCategories) {
-            if (productCategory.getProductCategoryID() == productCategoryID) {
-                return productCategory;
+                pstmt.addBatch();
             }
+
+            pstmt.executeBatch();
+            System.out.println("Sales facts stored in the database successfully.");
+
+        } catch (SQLException | ParseException e) {
+            e.printStackTrace();
         }
-        return null;
     }
 }

@@ -20,7 +20,7 @@ public class Main {
 
         // Load
         System.out.println("Load: Starting analysis phase...\n");
-        DataAnalysisApp dataAnalysisApp = new DataAnalysisApp(dataWarehouse);
+        DataAnalysisInCode dataAnalysisApp = new DataAnalysisInCode(dataWarehouse);
 
         // Get user input for analysis dimensions
         Scanner scanner = new Scanner(System.in);
