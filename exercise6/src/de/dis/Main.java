@@ -54,7 +54,8 @@ public class Main {
         scanner.close();
 
         System.out.println("\nPerforming analysis for geo: " + geo + ", time: " + time + ", product: " + product);
-        dataAnalysisApp.analysis(geo, time, product);
+        //dataAnalysisApp.analysis(geo, time, product);
+        dataAnalysisApp._analysis(geo, time, product, con);
     }
 
     private static void create_transformed_tables(Connection con) 
@@ -64,7 +65,7 @@ public class Main {
             con.createStatement().execute("DROP TABLE IF EXISTS t_articles");
             con.createStatement().execute("DROP TABLE IF EXISTS t_shops");
             con.createStatement().execute("CREATE TABLE t_articles (article_id INT, product_category VARCHAR(255), product_family VARCHAR(255), product_group VARCHAR(255), name VARCHAR(255), price float, PRIMARY KEY(article_id))");
-            con.createStatement().execute("CREATE TABLE t_shops (shop_id INT, country VARCHAR(255), region VARCHAR(255), city VARCHAR(255), PRIMARY KEY(shop_id))");
+            con.createStatement().execute("CREATE TABLE t_shops (shop_id INT, country VARCHAR(255), region VARCHAR(255), city VARCHAR(255), name VARCHAR(255), PRIMARY KEY(shop_id))");
             con.createStatement().execute("CREATE TABLE purchase (purchase_id serial PRIMARY KEY, shop_id INT, article_id INT, date DATE, amount INT, price float, FOREIGN KEY(shop_id) REFERENCES t_shops(shop_id), FOREIGN KEY(article_id) REFERENCES t_articles(article_id))");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -89,7 +90,7 @@ public class Main {
                 ps.execute();
             }
             for (Shop s : dwh.getShops()) {
-                PreparedStatement ps = con.prepareStatement("INSERT INTO t_shops (shop_id, country, region, city) VALUES (?,?,?,?)");
+                PreparedStatement ps = con.prepareStatement("INSERT INTO t_shops (shop_id, country, region, name, city) VALUES (?,?,?,?,?)");
                 ps.setInt(1, s.getShopID());
                 int cid = s.getCityID();
                 int rid = 0;
@@ -116,9 +117,10 @@ public class Main {
                 }
                 ps.setString(2, country);
                 ps.setString(3, region);
-                ps.setString(4, city);
+                ps.setString(4, s.getName());
+                ps.setString(5, city);
                 ps.execute();
-            }
+    }
             PreparedStatement ps = con.prepareStatement("INSERT INTO purchase (shop_id, article_id, date, amount, price) VALUES (?,?,?,?,?)");
             for (Purchase sf : dwh.getSalesFacts()) {
                 ps.setInt(1, sf.getShopID());

@@ -7,6 +7,10 @@ import java.util.Map;
 
 import de.dis.data.Purchase;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +39,70 @@ public class DataAnalysis {
         }
 
         printCrosstab(result);
+    }
+
+    public void _analysis(String geo, String time, String product, Connection con) {
+        String prod_sel;
+        String geo_sel;
+
+        switch (geo.toLowerCase()) {
+            case "shop":
+               geo_sel = "name";
+               break;
+            case "city":
+                geo_sel = "city";
+               break;
+            case "region":
+                geo_sel = "region";
+               break;
+            case "country":
+                geo_sel = "country";
+               break;
+            default:
+                geo_sel = "name";
+               break;
+        }
+
+        switch (product.toLowerCase()) {
+            case "article":
+               prod_sel = "name";
+               break;
+            case "productgroup":
+                prod_sel = "product_group";
+               break;
+            case "productcategory":
+                prod_sel = "product_category";
+               break;
+            case "productfamily":
+                prod_sel = "product_family";
+               break;
+            default:
+                prod_sel = "name";
+               break;
+        }
+
+        try {
+            Statement st = con.createStatement();
+            String query = """
+                            select purchase."date", t_articles."%s", t_shops."%s" , SUM(purchase.amount)
+                            from purchase
+                            join t_articles on t_articles.article_id = purchase.article_id
+                            join t_shops on t_shops.shop_id = purchase.shop_id
+                            group by cube("date", t_articles."%s", t_shops."%s")
+                            order by "date" asc;""";
+            ResultSet rs = st.executeQuery(String.format(query, prod_sel.toLowerCase(), geo_sel.toLowerCase(), 
+            prod_sel.toLowerCase(), geo_sel.toLowerCase()));
+            System.out.println(String.format(query, prod_sel.toLowerCase(), geo_sel.toLowerCase(), 
+            prod_sel.toLowerCase(), geo_sel.toLowerCase()));
+            while (rs.next()) {
+                System.out.print(rs.getDate("date") + " ");
+                System.out.print(rs.getString(prod_sel) + " ");
+                System.out.print(rs.getString(geo_sel) + " ");
+                System.out.println(rs.getInt("sum"));
+            }
+        } catch (SQLException e) {
+            e.getStackTrace();
+        }
     }
 
     private String getGeoKey(Purchase fact, String geo) {
