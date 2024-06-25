@@ -16,7 +16,7 @@ import java.util.Map;
 import de.dis.data.Country;
 import de.dis.data.Region;
 import de.dis.data.Sale;
-import de.dis.data.SalesFact;
+import de.dis.data.Purchase;
 import de.dis.data.City;
 import de.dis.data.Shop;
 import de.dis.data.Article;
@@ -26,12 +26,12 @@ import de.dis.data.ProductCategory;
 
 public class DataWarehouse {
 
-    private List<SalesFact> salesFacts;
-    public List<SalesFact> getSalesFacts() {
+    private List<Purchase> salesFacts;
+    public List<Purchase> getSalesFacts() {
         return salesFacts;
     }
 
-    public void setSalesFacts(List<SalesFact> salesFacts) {
+    public void setSalesFacts(List<Purchase> salesFacts) {
         this.salesFacts = salesFacts;
     }
 
@@ -257,7 +257,7 @@ public class DataWarehouse {
             ProductFamily productFamily = getProductFamilyByID(productGroup != null ? productGroup.getProductFamilyID() : 0);
             ProductCategory productCategory = getProductCategoryByID(productFamily != null ? productFamily.getProductCategoryID() : 0);
 
-            SalesFact fact = new SalesFact(
+            Purchase fact = new Purchase(
                     country != null ? country.getCountryID() : 0,
                     region != null ? region.getRegionID() : 0,
                     city != null ? city.getCityID() : 0,
@@ -278,7 +278,7 @@ public class DataWarehouse {
     public void aggregateSalesByDimensions() {
         Map<Integer, Double> salesByCountry = new HashMap<>();
 
-        for (SalesFact fact : salesFacts) {
+        for (Purchase fact : salesFacts) {
             int countryID = fact.getCountryID();
             double revenue = fact.getTurnover();
             salesByCountry.put(countryID, salesByCountry.getOrDefault(countryID, 0.0) + revenue);
@@ -328,7 +328,7 @@ public class DataWarehouse {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
 
-            for (SalesFact fact : salesFacts) {
+            for (Purchase fact : salesFacts) {
                 pstmt.setInt(1, fact.getCountryID());
                 pstmt.setInt(2, fact.getRegionID());
                 pstmt.setInt(3, fact.getCityID());

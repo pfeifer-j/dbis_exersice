@@ -5,25 +5,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.dis.data.SalesFact;
+import de.dis.data.Purchase;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DataAnalysisInCode {
+public class DataAnalysis {
 
     private DataWarehouse dataWarehouse;
 
-    public DataAnalysisInCode(DataWarehouse dataWarehouse) {
+    public DataAnalysis(DataWarehouse dataWarehouse) {
         this.dataWarehouse = dataWarehouse;
     }
 
     public void analysis(String geo, String time, String product) {
-        List<SalesFact> facts = dataWarehouse.getSalesFacts();
+        List<Purchase> facts = dataWarehouse.getSalesFacts();
 
         Map<String, Map<String, Map<String, Double>>> result = new HashMap<>();
 
-        for (SalesFact fact : facts) {
+        for (Purchase fact : facts) {
             String geoKey = getGeoKey(fact, geo);
             String timeKey = getTimeKey(fact, time);
             String productKey = getProductKey(fact, product);
@@ -37,7 +37,7 @@ public class DataAnalysisInCode {
         printCrosstab(result);
     }
 
-    private String getGeoKey(SalesFact fact, String geo) {
+    private String getGeoKey(Purchase fact, String geo) {
         switch (geo.toLowerCase()) {
             case "shop":
                 return dataWarehouse.getShopByID(fact.getShopID()).getName();
@@ -52,7 +52,7 @@ public class DataAnalysisInCode {
         }
     }
 
-    private String getTimeKey(SalesFact fact, String time) {
+    private String getTimeKey(Purchase fact, String time) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fact.getSaleDate());
         switch (time.toLowerCase()) {
@@ -73,7 +73,7 @@ public class DataAnalysisInCode {
         }
     }
 
-    private String getProductKey(SalesFact fact, String product) {
+    private String getProductKey(Purchase fact, String product) {
         switch (product.toLowerCase()) {
             case "article":
                 return dataWarehouse.getArticleByID(fact.getArticleID()).getName();

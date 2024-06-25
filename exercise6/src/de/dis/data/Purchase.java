@@ -2,7 +2,7 @@ package de.dis.data;
 
 import java.util.Date;
 
-public class SalesFact {
+public class Purchase {
     private int countryID;
     private int regionID;
     private int cityID;
@@ -15,7 +15,7 @@ public class SalesFact {
     private Date saleDate;
     private double turnover;
 
-    public SalesFact(int countryID, int regionID, int cityID, int shopID, int articleID,
+    public Purchase(int countryID, int regionID, int cityID, int shopID, int articleID,
                      int productGroupID, int productFamilyID, int productCategoryID,
                      Date saleDate, double turnover, int sold) {
         this.countryID = countryID;
@@ -31,7 +31,7 @@ public class SalesFact {
         this.sold = sold;
     }
 
-    public SalesFact() {
+    public Purchase() {
     }
 
     public int getCountryID() {

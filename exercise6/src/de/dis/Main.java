@@ -12,7 +12,7 @@ import de.dis.data.ProductCategory;
 import de.dis.data.ProductFamily;
 import de.dis.data.ProductGroup;
 import de.dis.data.Region;
-import de.dis.data.SalesFact;
+import de.dis.data.Purchase;
 import de.dis.data.Shop;
 
 public class Main {
@@ -33,7 +33,7 @@ public class Main {
 
         // Load
         System.out.println("Load: Starting analysis phase...\n");
-        DataAnalysisInCode dataAnalysisApp = new DataAnalysisInCode(dataWarehouse);
+        DataAnalysis dataAnalysisApp = new DataAnalysis(dataWarehouse);
 
         Connection con = DbConnectionManager.getInstance().getConnection();
         create_transformed_tables(con);
@@ -120,7 +120,7 @@ public class Main {
                 ps.execute();
             }
             PreparedStatement ps = con.prepareStatement("INSERT INTO purchase (shop_id, article_id, date, amount, price) VALUES (?,?,?,?,?)");
-            for (SalesFact sf : dwh.getSalesFacts()) {
+            for (Purchase sf : dwh.getSalesFacts()) {
                 ps.setInt(1, sf.getShopID());
                 ps.setInt(2, sf.getArticleID());
                 ps.setDate(3, new java.sql.Date(sf.getSaleDate().getTime()));
