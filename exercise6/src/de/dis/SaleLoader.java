@@ -16,7 +16,7 @@ import de.dis.data.Sale;
 
 public class SaleLoader {
 
-    final String PATH = "ressources\\sales.csv";
+    final String PATH = "ressources/sales.csv";
 
     public List<Sale> loadSalesFromCSV() {
         List<Sale> sales = new ArrayList<>();

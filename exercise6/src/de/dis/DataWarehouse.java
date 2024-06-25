@@ -267,7 +267,8 @@ public class DataWarehouse {
                     productFamily != null ? productFamily.getProductFamilyID() : 0,
                     productCategory != null ? productCategory.getProductCategoryID() : 0,
                     sale.getDate(),
-                    sale.getRevenue()
+                    sale.getRevenue(),
+                    sale.getSold()
             );
 
             salesFacts.add(fact);
