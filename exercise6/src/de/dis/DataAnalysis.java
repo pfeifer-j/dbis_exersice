@@ -1,18 +1,19 @@
 package de.dis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import de.dis.data.Purchase;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import de.dis.data.Purchase;
 
 public class DataAnalysis {
 
@@ -44,6 +45,7 @@ public class DataAnalysis {
     public void _analysis(String geo, String time, String product, Connection con) {
         String prod_sel;
         String geo_sel;
+        String time_sel;
 
         switch (geo.toLowerCase()) {
             case "shop":
@@ -80,22 +82,49 @@ public class DataAnalysis {
                 prod_sel = "name";
                break;
         }
+        switch (time.toLowerCase()) {
+            case "year":
+                time_sel = "year";
+                break;
+            case "quarter":
+                time_sel = "quarter";
+                break;
+            case "month":
+                time_sel = "month";
+                break;
+            case "day":
+                time_sel = "day";
+                break;
+            case "date":
+                time_sel = "date";
+                break;
+            default:
+                time_sel = "date";
+                break;
+        }
+
+        String date_fmt_part = (time_sel.equals("date")) ? "\"date\"" :
+        String.format("date_part('%s', \"date\")", time_sel);
 
         try {
             Statement st = con.createStatement();
             String query = """
-                            select purchase."date", t_articles."%s", t_shops."%s" , SUM(purchase.amount)
+                            select %s, t_articles."%s", t_shops."%s" , SUM(purchase.amount)
                             from purchase
                             join t_articles on t_articles.article_id = purchase.article_id
                             join t_shops on t_shops.shop_id = purchase.shop_id
-                            group by cube("date", t_articles."%s", t_shops."%s")
-                            order by "date" asc;""";
-            ResultSet rs = st.executeQuery(String.format(query, prod_sel.toLowerCase(), geo_sel.toLowerCase(), 
-            prod_sel.toLowerCase(), geo_sel.toLowerCase()));
-            System.out.println(String.format(query, prod_sel.toLowerCase(), geo_sel.toLowerCase(), 
-            prod_sel.toLowerCase(), geo_sel.toLowerCase()));
+                            group by cube(%s, t_articles."%s", t_shops."%s")
+                            order by %s asc;""";
+            ResultSet rs = st.executeQuery(String.format(query, date_fmt_part, prod_sel.toLowerCase(), geo_sel.toLowerCase(), date_fmt_part,
+            prod_sel.toLowerCase(), geo_sel.toLowerCase(), date_fmt_part));
+            System.err.println(String.format(query, date_fmt_part, prod_sel.toLowerCase(), geo_sel.toLowerCase(), date_fmt_part,
+            prod_sel.toLowerCase(), geo_sel.toLowerCase(), date_fmt_part));
+            boolean is_date = (time.equals("date")) ? true : false;
             while (rs.next()) {
-                System.out.print(rs.getDate("date") + " ");
+                if (is_date)
+                    System.out.print(rs.getDate("date") + " ");
+                else
+                    System.out.print(rs.getInt("date_part") + " ");
                 System.out.print(rs.getString(prod_sel) + " ");
                 System.out.print(rs.getString(geo_sel) + " ");
                 System.out.println(rs.getInt("sum"));
