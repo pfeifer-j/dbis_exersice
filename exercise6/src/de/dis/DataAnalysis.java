@@ -120,14 +120,19 @@ public class DataAnalysis {
             System.err.println(String.format(query, date_fmt_part, prod_sel.toLowerCase(), geo_sel.toLowerCase(), date_fmt_part,
             prod_sel.toLowerCase(), geo_sel.toLowerCase(), date_fmt_part));
             boolean is_date = (time.equals("date")) ? true : false;
+            String format = "%-20s%-40s%-40s%s%n";
             while (rs.next()) {
                 if (is_date)
-                    System.out.print(rs.getDate("date") + " ");
+                    //System.out.print(rs.getDate("date") + " ");
+                    System.out.printf(format, rs.getDate("date"),rs.getString(prod_sel),rs.getString(geo_sel),rs.getInt("sum"));
                 else
-                    System.out.print(rs.getInt("date_part") + " ");
-                System.out.print(rs.getString(prod_sel) + " ");
-                System.out.print(rs.getString(geo_sel) + " ");
-                System.out.println(rs.getInt("sum"));
+                    //System.out.print(rs.getInt("date_part") + " ");
+                    System.out.printf(format, rs.getInt("date_part"),rs.getString(prod_sel),rs.getString(geo_sel),rs.getInt("sum"));
+                //System.out.print(rs.getString(prod_sel) + " ");
+                //System.out.print(rs.getString(geo_sel) + " ");
+                //System.out.println(rs.getInt("sum"));
+                //System.out.printf(format, prefix1, msg);
+                //System.out.printf(format, prefix2, msg);
             }
         } catch (SQLException e) {
             e.getStackTrace();
